@@ -1,12 +1,9 @@
 ---
 service_tags:
-  - CHANGE_ME # list of tags you want to use to register with your application in the service discovery service. REQUIRED
-img_ver: CHANGE_ME # current version of your Docker image. REQUIRED
-healthcheck: 'CHANGE_ME' # the command which can be used to make sure the application is running correctly. REQUIRED
-healthcheck_interval: CHANGE_ME # how often to run the healthcheck. Default = 5s
-healthcheck_ttl: CHANGE_ME # how long successful healthchecks are valid for. This needs to be larger than the interval to prevent race conditions. Default = 15s
-healthcheck_timeout: CHANGE_ME # how long to allow the healthcheck to run before killing it. Default = 1s
-pre_start: 'CHANGE_ME' # the command/script used if anything needs to happen before our application starts. Delete if redundant
+  - apache # list of tags you want to use to register with your application in the service discovery service. REQUIRED
+  - googleproxy
+img_ver: 0.1.0 # current version of your Docker image. REQUIRED
+healthcheck: 'curl http://localhost' # the command which can be used to make sure the application is running correctly. REQUIRED
 command: CHANGE_ME # the command to start the application. REQUIRED
 install_scripts:
   - /usr/local/bin/install.sh # install script found in files/bin. Use multiple scripts as a list for different image layers. REQUIRED
@@ -16,7 +13,10 @@ service_port: CHANGE_ME # main service port of the application which will be pub
 ports:
   - CHANGE_ME # additional application ports which the application needs opening up. Delete if redundant
 build_args:
-  - CHANGE_ME # Variables only needed for the container build. Delete if redundant
+  - HTTPD_VER=2.4.29 # Variables only needed for the container build. Delete if redundant
+  - PREFIX=/usr/local/bin
+  - DOWNLOAD_URL=http://apache.mirror.anlx.net//httpd/httpd-${HTTPD_VER}.tar.gz
+  - CONFIG_DIR=/etc/{{ project_name }}
 container_vars:
   - CHANGE_ME # environment variables you want built into your container image. Delete if redundant
 env_vars:

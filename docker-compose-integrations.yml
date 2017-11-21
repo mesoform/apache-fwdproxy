@@ -1,0 +1,17 @@
+
+## This is a compose file to define any integrations for our application. It is concatenated with the main docker-compose.yml file
+## already created for our application. See tasks/start_orchestration.yml
+
+
+version: '2'
+
+#services:
+#  db:
+#    image: DB-IMAGE:VER
+#    domainname: "apache-fwdproxy.gcpservices.mesoform.com"
+#    mem_limit: 128m
+#    env_file:
+#      - _env
+#    network_mode: bridge
+#    command: > START_DB
+#

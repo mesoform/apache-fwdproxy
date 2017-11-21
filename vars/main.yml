@@ -1,23 +1,23 @@
 ---
+apache_prefix: /usr/local/apache
 service_tags:
   - apache # list of tags you want to use to register with your application in the service discovery service. REQUIRED
   - googleproxy
 img_ver: 0.1.0 # current version of your Docker image. REQUIRED
 healthcheck: 'curl http://localhost' # the command which can be used to make sure the application is running correctly. REQUIRED
-command: CHANGE_ME # the command to start the application. REQUIRED
+command: /usr/local/apache/bin/apachectl -k start # the command to start the application. REQUIRED
 install_scripts:
   - /usr/local/bin/install.sh # install script found in files/bin. Use multiple scripts as a list for different image layers. REQUIRED
 volumes:
-  - CHANGE_ME # any persistent volumes. Delete if redundant
-service_port: CHANGE_ME # main service port of the application which will be published to the service discovery system for downstream clients. Delete if redundant
-ports:
-  - CHANGE_ME # additional application ports which the application needs opening up. Delete if redundant
+  - /var/www/httpd-data # any persistent volumes. Delete if redundant
+service_port: 300031 # main service port of the application which will be published to the service discovery system for downstream clients. Delete if redundant
 build_args:
   - HTTPD_VER=2.4.29 # Variables only needed for the container build. Delete if redundant
-  - PREFIX=/usr/local/bin
+  - PREFIX={{ apache_prefix }}
   - DOWNLOAD_URL=http://apache.mirror.anlx.net//httpd/httpd-${HTTPD_VER}.tar.gz
   - CONFIG_DIR=/etc/{{ project_name }}
+  - PROXY_PORT={{ service_port }}
 container_vars:
-  - CHANGE_ME # environment variables you want built into your container image. Delete if redundant
+  - PREFIX={{ apache_prefix }} # environment variables you want built into your container image. Delete if redundant
 env_vars:
-  - CHANGE_ME # environment variables you want passed to the container at runtime. Delete if redundant
+  - GOOGLE_API_PROXY=10.71.200.10 # environment variables you want passed to the container at runtime. Delete if redundant

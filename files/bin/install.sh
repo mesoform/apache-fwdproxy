@@ -7,11 +7,9 @@ apt-get update \
         curl \
         libpcre3 \
         libpcre3-dev \
-        gcc-4.9 \
         build-essential \
         libaprutil1 \
-        libaprutil1-dev \
-        make
+        libaprutil1-dev
 
 
 # Download the latest release from http://httpd.apache.org/download.cgi
@@ -20,8 +18,16 @@ curl -o httpd-${HTTPD_VER}.tar.gz ${DOWNLOAD_URL}
 gzip -d httpd-${HTTPD_VER}.tar.gz
 tar xvf httpd-${HTTPD_VER}.tar
 cd httpd-${HTTPD_VER}
-./configure --prefix=${PREFIX} --sysconfdir=${CONFIG_DIR}
-make
-make install
-Customize	$ vi PREFIX/conf/httpd.conf
-Test	$ PREFIX/bin/apachectl -k start
+./configure --prefix=${PREFIX} \
+        --sysconfdir=${CONFIG_DIR} \
+        --enable-proxy-connect \
+        --enable-proxy \
+        --enable-proxy-http \
+        --enable-vhost-alias \
+        --enable-rewrite \
+        --enable-so \
+        --with-port=${PROXY_PORT} && \
+    make && \
+    make install
+#Customize	$ vi PREFIX/conf/httpd.conf
+#Test	$ PREFIX/bin/apachectl -k start

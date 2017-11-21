@@ -1,0 +1,15 @@
+# services is a version 2 only feature
+version: '2'
+
+services:
+  server:
+    image: "mesoform/concierge-apache-fwdproxy:0.1.0"
+    domainname: "apache-fwdproxy.gcpservices.mesoform.com"
+    restart: always
+    mem_limit: 128m
+    network_mode: bridge
+    command: /usr/local/apache/bin/apachectl -k start
+    environment:
+      - ZABBIX_SERVER=zabbix-server.inst.gaz.gb-home.cns.gorillass.co.uk
+      - SVC_DISCOVERY=consul.svc.gaz.gb-home.cns.gorillass.co.uk
+      - GOOGLE_API_PROXY=10.71.200.10

@@ -8,7 +8,7 @@ version: '2'
 #services:
 #  db:
 #    image: DB-IMAGE:VER
-#    domainname: "apache-fwdproxy.gcpservices.mesoform.com"
+#    domainname: "Apache-fwdproxy.gcpservices.mesoform.com"
 #    mem_limit: 128m
 #    env_file:
 #      - _env

@@ -1,15 +1,15 @@
 {
   consul: '{{ if .CONSUL_AGENT }}localhost{{ else }}{{ .SVC_DISCOVERY | default "consul"}}{{ end }}:8500',
   logging: {
-    level: '{{ .LOG_LEVEL | default "DEBUG" }}',
-    format: '{{ .LOG_FORMAT | default "default" }}'  },
+    level: '{{ .LOG_LEVEL }}',
+    format: '{{ .LOG_FORMAT }}'  },
   jobs: [
     {
       name: "platform_integration_setup",
       exec: "/usr/local/bin/setdomain.sh"
     },
     {
-      name: 'apache-fwdproxy',
+      name: 'Apache-fwdproxy',
       exec: [
         "/usr/local/apache/bin/apachectl -k start"
       ],
@@ -51,7 +51,7 @@
         "--key", "container.state",
         "--value", "0"],
       when: {
-        source: "apache-fwdproxy",
+        source: "Apache-fwdproxy",
         once: "unhealthy",
         interval: "10s",
         timeout: "3s"

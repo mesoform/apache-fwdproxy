@@ -3,7 +3,7 @@ apache_prefix: /usr/local/apache
 service_tags:
   - apache # list of tags you want to use to register with your application in the service discovery service. REQUIRED
   - googleproxy
-img_ver: 0.1.0 # current version of your Docker image. REQUIRED
+img_ver: Ver-0.1.0 # current version of your Docker image. REQUIRED
 healthcheck: 'curl http://localhost' # the command which can be used to make sure the application is running correctly. REQUIRED
 command: /usr/local/apache/bin/apachectl -k start # the command to start the application. REQUIRED
 install_scripts:

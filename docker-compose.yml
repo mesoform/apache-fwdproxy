@@ -3,8 +3,8 @@ version: '2'
 
 services:
   server:
-    image: "mesoform/concierge-apache-fwdproxy:0.1.0"
-    domainname: "apache-fwdproxy.gcpservices.mesoform.com"
+    image: "mesoform/concierge-apache-fwdproxy:ver-0.1.0"
+    domainname: "Apache-fwdproxy.gcpservices.mesoform.com"
     restart: always
     mem_limit: 128m
     network_mode: bridge

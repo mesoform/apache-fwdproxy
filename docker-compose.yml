@@ -1,15 +1,29 @@
 # services is a version 2 only feature
-version: '2'
+# Container Orchestration for a Concierge Managed Application
+# http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
+
+version: '2.1'
 
 services:
-  server:
+  app:
     image: "mesoform/concierge-apache-fwdproxy:ver-0.1.0"
-    domainname: "Apache-fwdproxy.gcpservices.mesoform.com"
+    domainname: "apache-fwdproxy.gcpservices.mesoform.com"
+    dns_search:
+      - apache-fwdproxy.gcpservices.mesoform.com
+      - svc.ops.mesoform-services.com
+    labels:
+      - triton.cns.services=apache-fwdproxy
     restart: always
     mem_limit: 128m
-    network_mode: bridge
-    command: /usr/local/apache/bin/apachectl -k start
+    ## For Triton bridge mode needs explicitly setting because the docker compose client
+    ## sends network_mode=default by default. The uncommenting of this line is handled
+    ## in the Ansible code but can obviously be uncommented personally for manual interaction
+    # network_mode: bridge
+    depends_on:
+      - consul
     environment:
-      - ZABBIX_SERVER=zabbix-server.inst.gaz.gb-home.cns.gorillass.co.uk
-      - SVC_DISCOVERY=consul.svc.gaz.gb-home.cns.gorillass.co.uk
+      - EM_SERVER=zabbix-server.inst.gaz.gb-home.cns.gorillass.co.uk
+      - SVC_DISCOVERY=consul:8301
       - GOOGLE_API_PROXY=10.71.200.10
+    ## uncomment to test your application start without containerpilot
+    #entrypoint: /usr/local/apache/bin/apachectl -e debug -Xf /etc/apache-fwdproxy/httpd.conf -k start

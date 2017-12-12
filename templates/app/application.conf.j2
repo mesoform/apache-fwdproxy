@@ -1,0 +1,29 @@
+##########################################################
+# This is a template of application.conf                 #
+# Apache web site:                                       #
+#   http://httpd.apache.org/docs/2.4/                    #
+##########################################################
+ 
+####################################################################################
+# AllowEncodedSlashes Directive                                                    #
+#  Determines whether encoded path separators in URLs are allowed to be            #
+#  passed through                                                                  #
+#  Syntax : AllowEncodedSlashes On|Off|NoDecode                                    #
+#  Reference : http://httpd.apache.org/docs/2.4/mod/core.html#allowencodedslashes  #
+####################################################################################
+AllowEncodedSlashes On
+ 
+############################################################
+# Restrict HTTP Methods                                    #
+# Only enable the HTTP Methods your application uses       #
+# The default list is restricted to GET, POST and HEAD     #
+# The full list of possible methods is:                    #
+# GET|POST|HEAD|PUT|DELETE|OPTIONS                         #
+#  Note: If all methods are required                       #
+#     - and to indicate this is intentional -              #
+#    remove or comment below lines and add this comment:   #
+#        #ENABLE-ALL-METHODS                               #
+############################################################
+RewriteCond %{REQUEST_METHOD} !^(GET|POST|HEAD|CONNECT)
+RewriteRule .* - [F]
+

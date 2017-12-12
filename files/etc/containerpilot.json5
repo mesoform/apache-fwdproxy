@@ -1,35 +1,40 @@
+/*
+Application Orchestration for a Concierge Managed Application
+http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
+*/
 {
-  consul: '{{ if .CONSUL_AGENT }}localhost{{ else }}{{ .SVC_DISCOVERY | default "consul"}}{{ end }}:8500',
+  consul: 'localhost:8500',
   logging: {
     level: '{{ .LOG_LEVEL }}',
     format: '{{ .LOG_FORMAT }}'  },
   jobs: [
     {
-      name: "platform_integration_setup",
-      exec: "/usr/local/bin/setdomain.sh"
+      name: "platform-integration-setup",
+      exec: "/usr/local/bin/platform_integration_setup.sh"
     },
     {
-      name: 'Apache-fwdproxy',
+      name: 'apache-fwdproxy',
       exec: [
-        "/usr/local/apache/bin/apachectl -k start"
+        "/usr/local/apache/bin/apachectl -e debug -Xf /etc/apache-fwdproxy/httpd.conf -k start"
       ],
-      port: "300031",
+      port: "30031",
       health: {
-        exec: 'curl http://localhost',
+        exec: 'curl http://localhost:30031',
         interval: "5",
-        ttl: "5",
-        timeout: "1",
+        ttl: "30",
+        timeout: "3",
       },
       tags: [
         "apache",
         "googleproxy"
       ],
-      {{ if .CONSUL_AGENT }}when: {
-        source: "consul_agent",
-        once: "healthy"
-      }{{ end }}    },
+      when: {
+        source: "platform-integration-setup",
+        once: "exitSuccess"
+      }
+    },
     {
-      name: "scheduling_status_healthy",
+      name: "scheduling-status-healthy",
       restarts: "unlimited",
       exec: ["zabbix_sender",
         "-c", "/etc/coprocesses/zabbix/zabbix_agentd.conf",
@@ -51,14 +56,14 @@
         "--key", "container.state",
         "--value", "0"],
       when: {
-        source: "Apache-fwdproxy",
+        source: "apache-fwdproxy",
         once: "unhealthy",
         interval: "10s",
         timeout: "3s"
       }
     },     */
     {
-      name: "zabbix_agent",
+      name: 'zabbix-agent',
       exec: ["/usr/sbin/zabbix_agentd", "-fc", "/etc/coprocesses/zabbix/zabbix_agentd.conf"],
       restarts: "unlimited",
       health: {
@@ -68,12 +73,12 @@
         timeout: 5
       },
       when: {
-        source: "pre_start",
+        source: "platform-integration-setup",
         once: "exitSuccess"
       }
     },
     {
-      name: "post_stop",
+      name: "post-stop",
       exec: ["zabbix_sender",
              "-c", "/etc/coprocesses/zabbix/zabbix_agentd.conf",
              "--key", "container.state",
@@ -82,30 +87,28 @@
         once: "shutdown"
       }
     },
-{{ if .CONSUL_AGENT }}{
-      name: "consul_agent",
+    {
+      name: "consul-agent",
       restarts: "unlimited",
       exec: [
         "/usr/local/bin/consul", "agent",
-        "-data-dir=/data",
-        "-config-dir=/config"
+        "-config-dir=/config",
+        "-data-dir=/tmp",
+        "-rejoin",
+        "-retry-join", "{{ .SVC_DISCOVERY }}",
+        "-retry-max", "10",
+        "-retry-interval", "10s"
       ],
-      health: {
-        exec: 'consul join {{ .SVC_DISCOVERY | default "consul"}}',
+/*      health: {
+        exec: "consul join {{ .SVC_DISCOVERY }}",
         interval: 5,
         ttl: 10
       },
-{% if pre_start is defined %}
+*/
       when: {
-        source: "pre_start",
+        source: "platform-integration-setup",
         once: "exitSuccess"
       }
-{% else %}
-      when: {
-        source: "platform_integration_setup",
-        once: "exitSuccess"
-      }
-{% endif %}
-    }{{ end }}
+    }
   ]
 }

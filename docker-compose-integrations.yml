@@ -1,17 +1,38 @@
-
-## This is a compose file to define any integrations for our application. It is concatenated with the main docker-compose.yml file
+## This is a compose file to define any integrations for our Concierge Managed Application.
+## It is concatenated with the main docker-compose.yml file
 ## already created for our application. See tasks/start_orchestration.yml
+## http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
 
-
-version: '2'
-
-#services:
-#  db:
-#    image: DB-IMAGE:VER
-#    domainname: "Apache-fwdproxy.gcpservices.mesoform.com"
-#    mem_limit: 128m
-#    env_file:
-#      - _env
-#    network_mode: bridge
-#    command: > START_DB
-#
+version: '2.1'
+services:
+  consul:
+    image: "mesoform/concierge-consul:devtest"
+    domainname: "consul.apache-fwdproxy.gcpservices.mesoform.com"
+    dns_search:
+      - apache-fwdproxy.gcpservices.mesoform.com
+      - svc.ops.mesoform-services.com
+    labels:
+      - triton.cns.services=consul
+    restart: always
+    mem_limit: "128m"
+    ## For Triton bridge mode needs explicitly setting because the docker compose client
+    ## sends network_mode=default by default. The uncommenting of this line is handled
+    ## in the Ansible code but can obviously be uncommented personally for manual interaction
+    # network_mode: bridge
+    ports:
+      - 8301/udp
+      - 8301/tcp
+      - 8300/tcp
+      - 8400
+      - 8302/udp
+      - 8302/tcp
+      - 8500
+    environment:
+      - CONSUL=consul
+      - SVC_DISCOVERY=consul:8301
+      - EM_SERVER=zabbix-server.inst.gaz.gb-home.cns.gorillass.co.uk
+    command: >
+      /usr/local/bin/consul agent -server
+        -bootstrap-expect 1
+        -config-dir=/etc/consul
+        -ui-dir /ui

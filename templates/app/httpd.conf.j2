@@ -1,0 +1,160 @@
+# server name #
+ServerName apache-fwdproxy
+# End - server name #
+
+# Server root #
+ServerRoot {{ apache_prefix }}
+# End - Server root #
+
+## Server modules #
+LoadModule      alias_module            modules/mod_alias.so
+LoadModule      access_compat_module    modules/mod_access_compat.so
+LoadModule      auth_basic_module       modules/mod_auth_basic.so
+LoadModule      authn_file_module       modules/mod_authn_file.so
+LoadModule      authz_host_module       modules/mod_authz_host.so
+LoadModule      authz_user_module       modules/mod_authz_user.so
+LoadModule      cache_module            modules/mod_cache.so
+LoadModule      deflate_module          modules/mod_deflate.so
+LoadModule      dir_module              modules/mod_dir.so
+LoadModule      env_module              modules/mod_env.so
+LoadModule      expires_module          modules/mod_expires.so
+LoadModule      proxy_module            modules/mod_proxy.so
+LoadModule      proxy_http_module       modules/mod_proxy_http.so
+LoadModule      headers_module          modules/mod_headers.so
+LoadModule      log_config_module       modules/mod_log_config.so
+LoadModule      logio_module            modules/mod_logio.so
+LoadModule      mime_magic_module       modules/mod_mime_magic.so
+LoadModule      mime_module             modules/mod_mime.so
+#LoadModule     proxy_module            modules/mod_proxy.so
+#LoadModule     proxy_http_module       modules/mod_proxy_http.so
+LoadModule      rewrite_module          modules/mod_rewrite.so
+LoadModule      setenvif_module         modules/mod_setenvif.so
+#LoadModule      ssl_module              modules/mod_ssl.so
+LoadModule      vhost_alias_module      modules/mod_vhost_alias.so
+LoadModule      proxy_connect_module    modules/mod_proxy_connect.so
+LoadModule      unixd_module            modules/mod_unixd.so
+LoadModule      filter_module           modules/mod_filter.so
+#LoadModule      mpm_prefork_module      modules/mod_mpm_prefork.so
+## End - Server modules #
+
+# Server modules #
+#Include conf.modules.d/*.conf
+# End - Server modules #
+
+
+# UseCanonicalName #
+UseCanonicalName Off
+# End - UseCanonicalName #
+
+# TraceEnable #
+TraceEnable off
+# End - TraceEnable #
+
+# user and group #
+User httpd
+Group httpd
+# End - user and group #
+
+# ServerAdmin #
+ServerAdmin you@your.address
+# End - ServerAdmin #
+
+# Restrict server token #
+ServerTokens Prod
+ServerSignature off
+# End - Restrict server token #
+
+# Remove ETAG disclosure to restrict inode disclosure #
+FileETag MTime Size
+# End Remove ETAG disclosure to restrict inode disclosure #
+
+# Only look for the index.html file #
+DirectoryIndex index.html
+AccessFileName .htaccess
+<Files ~ "^\.ht">
+  Order allow,deny
+  Deny from all
+</Files>
+# End - Only look for the index.html file #
+
+# Common log format #
+LogFormat "%h %l %u %t \"%r\" %s %>s %b \"%{Referer}i\" \"%{User-Agent}i\" \"%{COOKIE}i\" %T" common
+# End - Common log format #
+
+# p14 log format #
+LogFormat "%h - %u %t \"%r\" %s \"%{Content-Length}o\" \"%{Referer}i\" \"%{User-agent}i\" %m - - %H \"%{JSESSIONID}C\" \"%{HSBC_COOKIEMI}C\" %D" p14
+# End - p14 log format #
+
+# additional apache configs
+#LogFormat "%h - %u %t \"%r\" %s \"%{Content-Length}o\" \"%{Referer}i\" \"%{User-agent}i\" %m - - %H %D" proxy
+#LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+#LogFormat "%{Referer}i -> %U" referer
+#LogFormat "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b" ssl
+#LogFormat "%{User-agent}i" agent
+#LogFormat "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x %{Client_IP}e %{Client_Port}e" requests
+# End - additional apache configs
+
+# MIME settings #
+TypesConfig /etc/mime.types
+DefaultType text/plain
+<IfModule mod_mime_magic.c>
+  MIMEMagicFile conf/magic
+</IfModule>
+# End - MIME settings #
+
+# Restrict server-status access #
+<Location /server-status>
+  SetHandler server-status
+  Order deny,allow
+  Deny from all
+  Allow from none
+</Location>
+# End - Restrict server-status access #
+
+# Document root and permission settings #
+<Directory />
+  Options -Indexes
+  AllowOverride None
+  Order allow,deny
+  Allow from all
+</Directory>
+# End - Document root and permission settings #
+
+# Encoding types #
+AddEncoding x-compress Z
+AddEncoding x-gzip gz tgz
+AddType application/x-tar .tgz
+AddType image/x-icon .ico
+AddHandler type-map var
+# End - Encoding types #
+
+# Set environment variables for certain browser agents #
+BrowserMatch "Mozilla/2" nokeepalive
+BrowserMatch "MSIE 4\.0b2;" nokeepalive downgrade-1.0 force-response-1.0
+BrowserMatch "RealPlayer 4\.0" force-response-1.0
+BrowserMatch "Java/1\.0" force-response-1.0
+BrowserMatch "JDK/1\.0" force-response-1.0
+BrowserMatch "Microsoft Data Access Internet Publishing Provider" redirect-carefully
+BrowserMatch "MS FrontPage" redirect-carefully
+BrowserMatch "^WebDrive" redirect-carefully
+BrowserMatch "^WebDAVFS/1.[012]" redirect-carefully
+BrowserMatch "^gnome-vfs" redirect-carefully
+BrowserMatch "^XML Spy" redirect-carefully
+BrowserMatch "^Dreamweaver-WebDAV-SCM1" redirect-carefully
+# End - Set environment variables for certain browser agents #
+
+# Default document root #
+ErrorDocument 404 "Sorry, we are unable to find the document requested"
+ErrorDocument 500 "Sorry, an error occurred while processing your request"
+# End - Default document root #
+
+# Hostname Lookups #
+HostnameLookups Off
+# End - Hostname Lookups #
+
+
+
+# stand alone webserver Instance configruation for PDTP01UK-WS #
+<IfDefine APACHE-FWDPROXY>
+  Include /etc/{{ project_name }}/fproxy.conf
+</IfDefine>

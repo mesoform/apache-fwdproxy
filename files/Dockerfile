@@ -5,7 +5,7 @@ LABEL maintainer="Gareth Brown <gareth@mesoform.com>"
 LABEL description="Apache HTTPD set up as a forward proxy to Google API proxy"
 LABEL com.mesoform.baseimage=False
 LABEL com.joyent.autopilotpattern=True
-LABEL com.mesoform.builddate="2017-12-12T00:07:52Z"
+LABEL com.mesoform.builddate="2017-12-12T20:50:18Z"
 LABEL com.mesoform.baseimage.ver="mesoform/concierge-debian-base-image:devtest"
 LABEL com.docker.img.ver="mesoform/concierge-apache-fwdproxy:ver-0.1.0"
 
@@ -22,7 +22,7 @@ ARG HTTPD_VER=2.4.29
 ARG PREFIX=/usr/local/apache
 ARG DOWNLOAD_URL=http://apache.mirror.anlx.net//httpd/httpd-${HTTPD_VER}.tar.gz
 ARG CONFIG_DIR=/etc/apache-fwdproxy
-ARG PROXY_PORT=30031
+ARG PROXY_PORT=33000
 
 
 # If we have any install scripts, run them.
@@ -38,4 +38,4 @@ VOLUME [ "/var/www/httpd-data"  ]
 
 
 # Expose primary service port
-EXPOSE 30031
+EXPOSE 33000

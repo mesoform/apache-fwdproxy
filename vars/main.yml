@@ -12,7 +12,7 @@ install_scripts:
   - /usr/local/bin/compile.sh
 volumes:
   - /var/www/httpd-data # any persistent volumes. Delete if redundant
-service_port: 30031 # main service port of the application which will be published to the service discovery system for downstream clients. Delete if redundant
+service_port: 33000 # main service port of the application which will be published to the service discovery system for downstream clients. Delete if redundant
 healthcheck: 'curl http://localhost:{{ service_port }}' # the command which can be used to make sure the application is running correctly. REQUIRED
 build_args:
   - HTTPD_VER=2.4.29 # Variables only needed for the container build. Delete if redundant

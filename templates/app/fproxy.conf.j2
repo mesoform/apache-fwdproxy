@@ -30,11 +30,17 @@ ProxyPassReverse "/" "http://172.17.0.2:3128/"
   Order deny,allow
   Deny from all
   Allow from 172.17.0.3
+  <Directory /health>
+    Options -Indexes
+    AllowOverride None
+    Order allow,deny
+    Allow from localhost
+  </Directory>
 
 </Proxy>
 
 # VirtualHosts - SSL #
-Listen 0.0.0.0:33000
+Listen 0.0.0.0:{{ service_port }}
 #<VirtualHost 172.17.0.4:33000>
 
   LogLevel info

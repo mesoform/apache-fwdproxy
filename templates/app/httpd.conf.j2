@@ -51,8 +51,8 @@ TraceEnable off
 # End - TraceEnable #
 
 # user and group #
-User httpd
-Group httpd
+User www-data
+Group www-data
 # End - user and group #
 
 # ServerAdmin #
@@ -154,7 +154,7 @@ HostnameLookups Off
 
 
 
-# stand alone webserver Instance configruation for PDTP01UK-WS #
+# stand alone webserver Instance configruation setting up Apache as a forward proxy #
 <IfDefine APACHE-FWDPROXY>
   Include /etc/{{ project_name }}/fproxy.conf
 </IfDefine>

@@ -1,11 +1,11 @@
 ---
 apache_prefix: /usr/local/apache
 base_img_ver: devtest
-#app_config_dir: /etc/apache2
 service_tags:
   - apache # list of tags you want to use to register with your application in the service discovery service. REQUIRED
   - googleproxy
 img_ver: Ver-0.1.0 # current version of your Docker image. REQUIRED
+pre_start: /usr/local/bin/app-manage preStart
 command: "{{ apache_prefix }}/bin/apachectl -e debug -Xf /etc/{{ project_name }}/httpd.conf -k start -D APACHE-FWDPROXY" # the command to start the application. REQUIRED
 install_scripts:
   - /usr/local/bin/install.sh # install script found in files/bin. Use multiple scripts as a list for different image layers. REQUIRED
@@ -13,7 +13,7 @@ install_scripts:
 volumes:
   - /var/www/httpd-data # any persistent volumes. Delete if redundant
 service_port: 33000 # main service port of the application which will be published to the service discovery system for downstream clients. Delete if redundant
-healthcheck: 'curl http://localhost:{{ service_port }}' # the command which can be used to make sure the application is running correctly. REQUIRED
+healthcheck: /usr/local/bin/app-manage health # the command which can be used to make sure the application is running correctly. REQUIRED
 build_args:
   - HTTPD_VER=2.4.29 # Variables only needed for the container build. Delete if redundant
   - PREFIX={{ apache_prefix }}

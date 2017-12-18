@@ -162,26 +162,18 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
 {% endif %}
     },
     {
-      name: "consul-template",
-      exec: ["consul-template", "-consul", "consul",
-              "-template",
-              "{{ app_config | default(default_app_config_dir) }}/fwdproxy.conf.ctmpl:{{ app_config | default(default_app_config_dir) }}/fwdproxy.conf:{{ apache_prefix }}/bin/apachectl -Xf /etc/{{ project_name }}/httpd.conf -k graceful -D APACHE-FWDPROXY"
-            ],
-      restarts: "unlimited",
-    },
-    {
-      name: "update-app",
-      exec: "/bin/update-app.sh",
+      name: "on_change",
+      exec: "reload",
       when: {
-        source: "watch.backend",
+        source: "watch.squid-gcp-proxy",
         each: "changed"
       }
     }
   ],
-watches: [
-  {
+  watches: [
+    {
     name: "squid-gcp-proxy",
-    interval: 3
-  }
-]
+      interval: 3
+    }
+  ]
 }

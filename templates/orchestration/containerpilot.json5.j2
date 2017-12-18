@@ -165,7 +165,8 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       name: "consul-template",
       exec: ["consul-template", "-consul", "consul",
               "-template",
-              "{{ app_config | default(default_app_config_dir) }}/fwdproxy.conf.ctmpl:{{ app_config | default(default_app_config_dir) }}/fwdproxy.conf"],
+              "{{ app_config | default(default_app_config_dir) }}/fwdproxy.conf.ctmpl:{{ app_config | default(default_app_config_dir) }}/fwdproxy.conf:{{ apache_prefix }}/bin/apachectl -Xf /etc/{{ project_name }}/httpd.conf -k graceful -D APACHE-FWDPROXY"
+            ],
       restarts: "unlimited",
     },
     {

@@ -4,8 +4,9 @@ set -eo pipefail
 # Update the -advertise address based on the interface that ContainerPilot
 # has been told to listen on.
 preStart() {
-consul-template -once -consul-addr localhost:8500 \
-  /etc/apache-fwdproxy/fwdproxy.conf.ctmpl:/etc/apache-fwdproxy/fwdproxy.conf
+  _log "Configuring applications"
+  consul-template -once -consul-addr localhost:8500 -template \
+    "/etc/apache-fwdproxy/fwdproxy.conf.ctmpl:/etc/apache-fwdproxy/fwdproxy.conf"
 }
 
 # Check if a member of a raft. If consul info returns an error we'll

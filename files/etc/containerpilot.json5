@@ -10,22 +10,30 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
   jobs: [
     {
       name: 'platform-integration-setup',
-      exec: '/usr/local/bin/platform_integration_setup.sh'
+      exec: '/usr/local/bin/platform_integration.sh setup'
     },
     {
-      name: 'apache-fwdproxy',
-      exec: '/usr/local/apache/bin/apachectl -e debug -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY',
-      port: '33000',
-      health: {
-        exec: 'curl http://localhost:33000',
-        interval: '5',
-        ttl: '30',
-        timeout: '3',
-      },
-      tags: [
-        'apache',
-        'googleproxy'
+      name: 'consul-agent',
+      restarts: 'unlimited',
+      exec: [
+        '/usr/local/bin/consul', 'agent',
+        '-config-dir=/etc/coprocesses/consul',
+        '-data-dir=/var/lib/consul',
+        '-rejoin',
+        '-retry-join', '{{ .SVC_DISCOVERY }}',
+        '-retry-max', '10',
+        '-retry-interval', '10s'
       ],
+/*      health: {
+        exec: 'consul join {{ .SVC_DISCOVERY }}',
+        interval: 5,
+        ttl: 10
+      },
+*/
+    },
+    {
+      name: 'pre-start',
+      exec: '/usr/local/bin/app-manage preStart',
       when: {
         source: 'platform-integration-setup',
         once: 'exitSuccess'
@@ -62,7 +70,10 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     },     */
     {
       name: 'zabbix-agent',
-      exec: ['/usr/sbin/zabbix_agentd', '-fc', '/etc/coprocesses/zabbix/zabbix_agentd.conf'],
+      exec: ['/usr/sbin/zabbix_agentd',
+              '-fc',
+              '/etc/coprocesses/zabbix/zabbix_agentd.conf'
+      ],
       restarts: 'unlimited',
       health: {
         exec: 'zabbix_agentd -t agent.ping',
@@ -71,7 +82,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         timeout: 5
       },
       when: {
-        source: 'platform-integration-setup',
+        source: 'pre-start',
         once: 'exitSuccess'
       }
     },
@@ -86,27 +97,37 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
     },
     {
-      name: 'consul-agent',
-      restarts: 'unlimited',
-      exec: [
-        '/usr/local/bin/consul', 'agent',
-        '-config-dir=/config',
-        '-data-dir=/tmp',
-        '-rejoin',
-        '-retry-join', '{{ .SVC_DISCOVERY }}',
-        '-retry-max', '10',
-        '-retry-interval', '10s'
-      ],
-/*      health: {
-        exec: 'consul join {{ .SVC_DISCOVERY }}',
-        interval: 5,
-        ttl: 10
+      name: 'apache-fwdproxy',
+      exec: '/usr/local/apache/bin/apachectl -e debug -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY',
+      port: '33000',
+      health: {
+        exec: '/usr/local/bin/app-manage health',
+        interval: '10',
+        ttl: '30',
+        timeout: '3',
       },
-*/
+      tags: [
+        'apache',
+        'googleproxy'
+      ],
       when: {
-        source: 'platform-integration-setup',
+        source: 'pre-start',
         once: 'exitSuccess'
       }
+    },
+    {
+      name: "on_change",
+      exec: "reload",
+      when: {
+        source: "watch.squid-gcp-proxy",
+        each: "changed"
+      }
+    }
+  ],
+  watches: [
+    {
+    name: "squid-gcp-proxy",
+      interval: 3
     }
   ]
 }

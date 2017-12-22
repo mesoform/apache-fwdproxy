@@ -21,8 +21,9 @@ Header add S ADDED-HEADER
 
 ## Proxy Config
 <Proxy balancer://squid-gcp-proxy>
-{% raw %}{{ range service "squid-gcp-proxy" }}
-    BalancerMember http://{{.Address}}:{{.Port}}{{end}}{% endraw %}
+{% raw %}{{ range service "squid-gcp-proxy" }}    BalancerMember http://{{.Address}}:{{.Port}}
+{{end}}
+{% endraw %}
     ProxySet lbmethod=bybusyness
     Order deny,allow
     Deny from all
@@ -43,7 +44,7 @@ ProxyPassReverse / balancer://squid-gcp-proxy/
 Listen 0.0.0.0:{{ service_port }}
 
 LogLevel {{ log_level | default("info") | lower }}
-ErrorLog "/var/log/{{ project_name }}/error_log"
-CustomLog "/var/log/{{ project_name }}/access_log" p14
+ErrorLog syslog:user
+CustomLog syslog:user p14
 
 

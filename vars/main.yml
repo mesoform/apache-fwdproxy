@@ -1,12 +1,13 @@
 ---
 apache_prefix: /usr/local/apache
 base_img_ver: devtest
+log_level: debug
 service_tags:
   - apache # list of tags you want to use to register with your application in the service discovery service. REQUIRED
   - googleproxy
 img_ver: Ver-0.1.0 # current version of your Docker image. REQUIRED
 pre_start: /usr/local/bin/app-manage preStart
-command: "{{ apache_prefix }}/bin/apachectl -e debug -Xf /etc/{{ project_name }}/httpd.conf -k start -D APACHE-FWDPROXY" # the command to start the application. REQUIRED
+command: "{{ apache_prefix }}/bin/apachectl -Xf /etc/{{ project_name }}/httpd.conf -k start -D APACHE-FWDPROXY" # the command to start the application. REQUIRED
 install_scripts:
   - /usr/local/bin/install.sh # install script found in files/bin. Use multiple scripts as a list for different image layers. REQUIRED
   - /usr/local/bin/compile.sh

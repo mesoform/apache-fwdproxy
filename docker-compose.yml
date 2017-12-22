@@ -26,4 +26,4 @@ services:
       - SVC_DISCOVERY=consul:8301
       - GOOGLE_API_PROXY=10.71.200.10
     ## uncomment to test your application start without containerpilot
-    #entrypoint: /usr/local/apache/bin/apachectl -e debug -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY
+    #entrypoint: /usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY

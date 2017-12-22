@@ -15,6 +15,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     {
       name: 'consul-agent',
       restarts: 'unlimited',
+      stopTimeout: "5s",
       exec: [
         '/usr/local/bin/consul', 'agent',
         '-config-dir=/etc/coprocesses/consul',
@@ -24,30 +25,42 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         '-retry-max', '10',
         '-retry-interval', '10s'
       ],
-/*      health: {
-        exec: 'consul join {{ .SVC_DISCOVERY }}',
-        interval: 5,
-        ttl: 10
+      when: {
+        source: 'platform-integration-setup',
+        once: 'exitSuccess'
       },
-*/
+      health: {
+        exec: 'curl --fail http://localhost:8500',
+        interval: 5,
+        ttl: 10,
+        timeout: 2
+      }
+    },
+    {
+      name: "leave-consul",
+      exec: "consul leave",
+      when: {
+        source: "consul-agent",
+        once: "stopping"
+      }
     },
     {
       name: 'pre-start',
       exec: '/usr/local/bin/app-manage preStart',
       when: {
-        source: 'platform-integration-setup',
-        once: 'exitSuccess'
+        source: 'consul-agent',
+        once: 'healthy'
       }
     },
     {
       name: 'scheduling-status-healthy',
-      restarts: 'unlimited',
       exec: ['zabbix_sender',
         '-c', '/etc/coprocesses/zabbix/zabbix_agentd.conf',
         '--key', 'container.state',
         '--value', '1'],
       when: {
-        interval: '10s',
+        source: 'apache-fwdproxy',
+        each: 'healthy'
       }
     },
 /*  ToDo: sending state=0 when main service is unhealthy
@@ -82,7 +95,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         timeout: 5
       },
       when: {
-        source: 'pre-start',
+        source: 'platform-integration-setup',
         once: 'exitSuccess'
       }
     },
@@ -98,13 +111,15 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     },
     {
       name: 'apache-fwdproxy',
-      exec: '/usr/local/apache/bin/apachectl -e debug -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY',
+      exec: '/usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY',
+      stopTimeout: "5s",
+      restarts: 3,
       port: '33000',
       health: {
         exec: '/usr/local/bin/app-manage health',
-        interval: '10',
-        ttl: '30',
-        timeout: '3',
+        interval: 10,
+        ttl: 30,
+        timeout: 3,
       },
       tags: [
         'apache',
@@ -117,7 +132,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     },
     {
       name: "on_change",
-      exec: "reload",
+      exec: "/usr/local/bin/app-manage reload",
       when: {
         source: "watch.squid-gcp-proxy",
         each: "changed"

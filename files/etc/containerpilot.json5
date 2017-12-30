@@ -125,6 +125,10 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         'apache',
         'googleproxy'
       ],
+      consul: {
+        enableTagOverride: true,
+        deregisterCriticalServiceAfter: "10m"
+      },
       when: {
         source: 'pre-start',
         once: 'exitSuccess'

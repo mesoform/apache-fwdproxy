@@ -18,27 +18,35 @@ Include /etc/{{ project_name }}/compression.conf
 ## adding header so that we know what web server we are in
 Header add S ADDED-HEADER
 
+## allow healthcheck
+ProxyPass /health !
+<location /health>
+    Options -Indexes
+    Order allow,deny
+    Allow from localhost
+</location>
 
 ## Proxy Config
 <Proxy balancer://squid-gcp-proxy>
 {% raw %}{{ range service "squid-gcp-proxy" }}    BalancerMember http://{{.Address}}:{{.Port}}
 {{end}}
 {% endraw %}
-    ProxySet lbmethod=bybusyness
     Order deny,allow
     Deny from all
     Allow from 172.19.0.0/16
-    <Directory /health>
-        Options -Indexes
-        AllowOverride None
-        Order allow,deny
-        Allow from localhost
-    </Directory>
+    Allow from 192.168.77.193
 </Proxy>
-ProxyRequests Off
+ProxyRequests On
 ProxyPreserveHost On
-ProxyPass / balancer://squid-gcp-proxy/
-ProxyPassReverse / balancer://squid-gcp-proxy/
+ProxyAddHeaders On
+#ProxyVia On
+ProxyRemote * balancer://squid-gcp-proxy/
+AllowCONNECT 443 80
+
+#ProxyRequests Off
+#ProxyPreserveHost On
+#ProxyPass / balancer://squid-gcp-proxy/
+#ProxyPassReverse / balancer://squid-gcp-proxy/
 
 
 Listen 0.0.0.0:{{ service_port }}

@@ -16,6 +16,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     {
       name: 'consul-agent',
       restarts: 'unlimited',
+      stopTimeout: "5s",
 {% if svc_discovery is defined %}
       exec: [
         '/usr/local/bin/consul', 'agent',
@@ -34,33 +35,45 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         '-join', 'localhost'
       ],
 {% endif %}
-/*      health: {
-        exec: 'consul join {% raw %}{{ .SVC_DISCOVERY }}{% endraw %}',
-        interval: 5,
-        ttl: 10
+      when: {
+        source: 'platform-integration-setup',
+        once: 'exitSuccess'
       },
-*/
+      health: {
+        exec: 'curl --fail http://localhost:8500',
+        interval: 5,
+        ttl: 10,
+        timeout: 2
+      }
+    },
+    {
+      name: "leave-consul",
+      exec: "consul leave",
+      when: {
+        source: "consul-agent",
+        once: "stopping"
+      }
     },
 {% if pre_start is defined %}
     {
       name: 'pre-start',
       exec: '{{ pre_start }}',
       when: {
-        source: 'platform-integration-setup',
-        once: 'exitSuccess'
+        source: 'consul-agent',
+        once: 'healthy'
       }
     },
 {% endif %}
 {% if event_management is defined %}
     {
       name: 'scheduling-status-healthy',
-      restarts: 'unlimited',
       exec: ['zabbix_sender',
         '-c', '/etc/coprocesses/zabbix/zabbix_agentd.conf',
         '--key', 'container.state',
         '--value', '1'],
       when: {
-        interval: '10s',
+        source: '{{ project_name }}',
+        each: 'healthy'
       }
     },
 /*  ToDo: sending state=0 when main service is unhealthy
@@ -94,17 +107,10 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         ttl: 60,
         timeout: 5
       },
-{% if pre_start is defined %}
-      when: {
-        source: 'pre-start',
-        once: 'exitSuccess'
-      }
-{% else %}
       when: {
         source: 'platform-integration-setup',
         once: 'exitSuccess'
       }
-{% endif %}
     },
     {
       name: 'post-stop',
@@ -120,14 +126,16 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     {
       name: '{{ project_name }}',
       exec: '{{ command }}',
+      stopTimeout: "5s",
+      restarts: 3,
 {% if service_port is defined %}
       port: '{{ service_port }}',
 {% endif %}
       health: {
         exec: '{{ healthcheck }}',
-        interval: '{{ healthcheck_interval | default(default_healthcheck_interval) }}',
-        ttl: '{{ healthcheck_ttl | default(default_healthcheck_ttl) }}',
-        timeout: '{{ healthcheck_timeout | default(default_healthcheck_timeout) }}',
+        interval: {{ healthcheck_interval | default(default_healthcheck_interval) }},
+        ttl: {{ healthcheck_ttl | default(default_healthcheck_ttl) }},
+        timeout: {{ healthcheck_timeout | default(default_healthcheck_timeout) }},
       },
       tags: [
 {% for tag in service_tags %}
@@ -138,6 +146,10 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
 {% endif %}
 {% endfor %}
       ],
+      consul: {
+        enableTagOverride: true,
+        deregisterCriticalServiceAfter: "10m"
+      },
 {% if pre_start is defined %}
       when: {
         source: 'pre-start',
@@ -152,7 +164,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     },
     {
       name: "on_change",
-      exec: "reload",
+      exec: "/usr/local/bin/app-manage reload",
       when: {
         source: "watch.squid-gcp-proxy",
         each: "changed"

@@ -11,7 +11,7 @@ preStart() {
 
 health() {
   #curl --fail http://localhost:33000 > /dev/null
-  curl http://localhost:33000 > /dev/null
+  curl http://localhost:33000/health > /dev/null
 }
 
 reload() {

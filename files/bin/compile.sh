@@ -4,6 +4,7 @@ cd /tmp/httpd-${HTTPD_VER}
 ./configure --prefix=${PREFIX} \
         --sysconfdir=${CONFIG_DIR} \
         --enable-proxy-connect \
+        --enable-proxy-balancer \
         --enable-proxy \
         --enable-proxy-http \
         --enable-vhost-alias \

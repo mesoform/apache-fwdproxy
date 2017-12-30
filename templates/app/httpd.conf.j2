@@ -96,7 +96,6 @@ LogFormat "%h - %u %t \"%r\" %s \"%{Content-Length}o\" \"%{Referer}i\" \"%{User-
 
 # MIME settings #
 TypesConfig /etc/mime.types
-DefaultType text/plain
 <IfModule mod_mime_magic.c>
   MIMEMagicFile conf/magic
 </IfModule>
@@ -156,5 +155,5 @@ HostnameLookups Off
 
 # stand alone webserver Instance configruation setting up Apache as a forward proxy #
 <IfDefine APACHE-FWDPROXY>
-  Include /etc/{{ project_name }}/fproxy.conf
+  Include /etc/{{ project_name }}/fwdproxy.conf
 </IfDefine>

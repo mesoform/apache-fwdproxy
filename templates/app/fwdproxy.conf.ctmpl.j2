@@ -22,8 +22,7 @@ Header add S ADDED-HEADER
 ProxyPass /health !
 <location /health>
     Options -Indexes
-    Order allow,deny
-    Allow from localhost
+    Require local
 </location>
 
 ## Proxy Config
@@ -31,28 +30,26 @@ ProxyPass /health !
 {% raw %}{{ range service "squid-gcp-proxy" }}    BalancerMember http://{{.Address}}:{{.Port}}
 {{end}}
 {% endraw %}
-    Order deny,allow
-    Deny from all
-    Allow from 172.19.0.0/16
-    Allow from 192.168.77.193
+    Require ip 172.19.0.0/16
+    Require ip 192.168.77.193
 </Proxy>
-ProxyRequests On
-ProxyPreserveHost On
-ProxyAddHeaders On
-#ProxyVia On
-ProxyRemote * balancer://squid-gcp-proxy/
-AllowCONNECT 443 80
-
-#ProxyRequests Off
+#ProxyRequests On
 #ProxyPreserveHost On
-#ProxyPass / balancer://squid-gcp-proxy/
-#ProxyPassReverse / balancer://squid-gcp-proxy/
+#ProxyAddHeaders On
+#ProxyVia On
+#ProxyRemote * balancer://squid-gcp-proxy/
+#AllowCONNECT 443 80
+
+ProxyRequests Off
+ProxyPreserveHost On
+ProxyPass / balancer://squid-gcp-proxy/
+ProxyPassReverse / balancer://squid-gcp-proxy/
 
 
 Listen 0.0.0.0:{{ service_port }}
 
 LogLevel {{ log_level | default("info") | lower }}
-ErrorLog syslog:user
-CustomLog syslog:user p14
+ErrorLog "/dev/stderr"
+CustomLog "/dev/stdout" p14
 
 

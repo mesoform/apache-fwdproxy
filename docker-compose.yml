@@ -21,6 +21,9 @@ services:
     # network_mode: bridge
     depends_on:
       - consul
+    ports:
+      - 33000
+      - 10050
     environment:
       - EM_SERVER=zabbix-server.inst.gaz.gb-home.cns.gorillass.co.uk
       - SVC_DISCOVERY=consul:8301

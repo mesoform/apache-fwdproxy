@@ -8,8 +8,9 @@ ServerRoot {{ apache_prefix }}
 
 ## Server modules #
 LoadModule      alias_module            modules/mod_alias.so
-LoadModule      access_compat_module    modules/mod_access_compat.so
+#LoadModule      access_compat_module    modules/mod_access_compat.so
 LoadModule      auth_basic_module       modules/mod_auth_basic.so
+LoadModule      authz_core_module       modules/mod_authz_core.so
 LoadModule      authn_file_module       modules/mod_authn_file.so
 LoadModule      authz_host_module       modules/mod_authz_host.so
 LoadModule      authz_user_module       modules/mod_authz_user.so
@@ -20,18 +21,17 @@ LoadModule      env_module              modules/mod_env.so
 LoadModule      expires_module          modules/mod_expires.so
 LoadModule      proxy_module            modules/mod_proxy.so
 LoadModule      proxy_http_module       modules/mod_proxy_http.so
+LoadModule      proxy_connect_module    modules/mod_proxy_connect.so
+LoadModule      proxy_balancer_module   modules/mod_proxy_balancer.so
 LoadModule      headers_module          modules/mod_headers.so
 LoadModule      log_config_module       modules/mod_log_config.so
 LoadModule      logio_module            modules/mod_logio.so
 LoadModule      mime_magic_module       modules/mod_mime_magic.so
 LoadModule      mime_module             modules/mod_mime.so
-#LoadModule     proxy_module            modules/mod_proxy.so
-#LoadModule     proxy_http_module       modules/mod_proxy_http.so
 LoadModule      rewrite_module          modules/mod_rewrite.so
 LoadModule      setenvif_module         modules/mod_setenvif.so
 #LoadModule      ssl_module              modules/mod_ssl.so
 LoadModule      vhost_alias_module      modules/mod_vhost_alias.so
-LoadModule      proxy_connect_module    modules/mod_proxy_connect.so
 LoadModule      unixd_module            modules/mod_unixd.so
 LoadModule      filter_module           modules/mod_filter.so
 #LoadModule      mpm_prefork_module      modules/mod_mpm_prefork.so
@@ -72,8 +72,7 @@ FileETag MTime Size
 DirectoryIndex index.html
 AccessFileName .htaccess
 <Files ~ "^\.ht">
-  Order allow,deny
-  Deny from all
+    Require all denied
 </Files>
 # End - Only look for the index.html file #
 
@@ -97,25 +96,21 @@ LogFormat "%h - %u %t \"%r\" %s \"%{Content-Length}o\" \"%{Referer}i\" \"%{User-
 # MIME settings #
 TypesConfig /etc/mime.types
 <IfModule mod_mime_magic.c>
-  MIMEMagicFile conf/magic
+  MIMEMagicFile {{ default_app_config_dir }}/magic
 </IfModule>
 # End - MIME settings #
 
 # Restrict server-status access #
 <Location /server-status>
-  SetHandler server-status
-  Order deny,allow
-  Deny from all
-  Allow from none
+    SetHandler server-status
+    Require local
 </Location>
 # End - Restrict server-status access #
 
 # Document root and permission settings #
 <Directory />
-  Options -Indexes
-  AllowOverride None
-  Order allow,deny
-  Allow from all
+    Options -Indexes
+    Require all granted
 </Directory>
 # End - Document root and permission settings #
 

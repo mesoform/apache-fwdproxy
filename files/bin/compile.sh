@@ -7,6 +7,7 @@ cd /tmp/httpd-${HTTPD_VER}
         --enable-proxy-balancer \
         --enable-proxy \
         --enable-proxy-http \
+        --enable-lbmethod-bybusyness \
         --enable-vhost-alias \
         --enable-rewrite \
         --enable-so \

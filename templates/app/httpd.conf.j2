@@ -7,39 +7,34 @@ ServerRoot {{ apache_prefix }}
 # End - Server root #
 
 ## Server modules #
-LoadModule      alias_module            modules/mod_alias.so
-#LoadModule      access_compat_module    modules/mod_access_compat.so
-LoadModule      auth_basic_module       modules/mod_auth_basic.so
-LoadModule      authz_core_module       modules/mod_authz_core.so
-LoadModule      authn_file_module       modules/mod_authn_file.so
-LoadModule      authz_host_module       modules/mod_authz_host.so
-LoadModule      authz_user_module       modules/mod_authz_user.so
-LoadModule      cache_module            modules/mod_cache.so
-LoadModule      deflate_module          modules/mod_deflate.so
-LoadModule      dir_module              modules/mod_dir.so
-LoadModule      env_module              modules/mod_env.so
-LoadModule      expires_module          modules/mod_expires.so
-LoadModule      proxy_module            modules/mod_proxy.so
-LoadModule      proxy_http_module       modules/mod_proxy_http.so
-LoadModule      proxy_connect_module    modules/mod_proxy_connect.so
-LoadModule      proxy_balancer_module   modules/mod_proxy_balancer.so
-LoadModule      headers_module          modules/mod_headers.so
-LoadModule      log_config_module       modules/mod_log_config.so
-LoadModule      logio_module            modules/mod_logio.so
-LoadModule      mime_magic_module       modules/mod_mime_magic.so
-LoadModule      mime_module             modules/mod_mime.so
-LoadModule      rewrite_module          modules/mod_rewrite.so
-LoadModule      setenvif_module         modules/mod_setenvif.so
-#LoadModule      ssl_module              modules/mod_ssl.so
-LoadModule      vhost_alias_module      modules/mod_vhost_alias.so
-LoadModule      unixd_module            modules/mod_unixd.so
-LoadModule      filter_module           modules/mod_filter.so
-#LoadModule      mpm_prefork_module      modules/mod_mpm_prefork.so
+LoadModule      alias_module                modules/mod_alias.so
+LoadModule      auth_basic_module           modules/mod_auth_basic.so
+LoadModule      authz_core_module           modules/mod_authz_core.so
+LoadModule      authn_file_module           modules/mod_authn_file.so
+LoadModule      authz_host_module           modules/mod_authz_host.so
+LoadModule      authz_user_module           modules/mod_authz_user.so
+LoadModule      cache_module                modules/mod_cache.so
+LoadModule      deflate_module              modules/mod_deflate.so
+LoadModule      dir_module                  modules/mod_dir.so
+LoadModule      env_module                  modules/mod_env.so
+LoadModule      expires_module              modules/mod_expires.so
+LoadModule      proxy_module                modules/mod_proxy.so
+LoadModule      proxy_http_module           modules/mod_proxy_http.so
+LoadModule      proxy_connect_module        modules/mod_proxy_connect.so
+LoadModule      proxy_balancer_module       modules/mod_proxy_balancer.so
+LoadModule      lbmethod_bybusyness_module  modules/mod_lbmethod_bybusyness.so
+LoadModule      slotmem_shm_module          modules/mod_slotmem_shm.so
+LoadModule      headers_module              modules/mod_headers.so
+LoadModule      log_config_module           modules/mod_log_config.so
+LoadModule      logio_module                modules/mod_logio.so
+LoadModule      mime_magic_module           modules/mod_mime_magic.so
+LoadModule      mime_module                 modules/mod_mime.so
+LoadModule      rewrite_module              modules/mod_rewrite.so
+LoadModule      setenvif_module             modules/mod_setenvif.so
+LoadModule      vhost_alias_module          modules/mod_vhost_alias.so
+LoadModule      unixd_module                modules/mod_unixd.so
+LoadModule      filter_module               modules/mod_filter.so
 ## End - Server modules #
-
-# Server modules #
-#Include conf.modules.d/*.conf
-# End - Server modules #
 
 
 # UseCanonicalName #
@@ -146,6 +141,10 @@ ErrorDocument 500 "Sorry, an error occurred while processing your request"
 HostnameLookups Off
 # End - Hostname Lookups #
 
+<Location "/balancer-manager">
+    SetHandler balancer-manager
+    Require host example.com
+</Location>
 
 
 # stand alone webserver Instance configruation setting up Apache as a forward proxy #

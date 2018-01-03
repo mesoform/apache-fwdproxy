@@ -59,7 +59,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       name: 'pre-start',
       exec: '{{ pre_start }}',
       when: {
-        source: 'consul-agent',
+        source: "watch.squid-gcp-proxy",
         once: 'healthy'
       }
     },

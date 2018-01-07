@@ -25,7 +25,7 @@ reload() {
             -k graceful \
             -D APACHE-FWDPROXY
     else
-        _log "ERROR: application not running. Can't reload"
+        _log "WARNING: application not running. Can't reload"
     fi
 
 }

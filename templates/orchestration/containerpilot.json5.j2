@@ -40,7 +40,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         once: 'exitSuccess'
       },
       health: {
-        exec: 'curl --fail http://localhost:8500',
+        exec: 'curl --fail -Ss http://localhost:8500',
         interval: 5,
         ttl: 10,
         timeout: 2
@@ -125,7 +125,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
 {% endif %}
     {
       name: '{{ project_name }}',
-      exec: '{{ command }}',
+      exec: {% raw %}'{{ .COMMAND }}'{% endraw %},
       restarts: 3,
 {% if service_port is defined %}
       port: '{{ service_port }}',

@@ -30,7 +30,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         once: 'exitSuccess'
       },
       health: {
-        exec: 'curl --fail http://localhost:8500',
+        exec: 'curl --fail -Ss http://localhost:8500',
         interval: 5,
         ttl: 10,
         timeout: 2
@@ -111,7 +111,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     },
     {
       name: 'apache-fwdproxy',
-      exec: '/usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY',
+      exec: '{{ .COMMAND }}',
       restarts: 3,
       port: '33000',
       health: {
@@ -144,7 +144,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
   ],
   watches: [
     {
-      name: "squid-gcp-proxy",
+    name: "squid-gcp-proxy",
       interval: 3
     }
   ]

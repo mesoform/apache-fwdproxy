@@ -112,7 +112,6 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     {
       name: 'apache-fwdproxy',
       exec: '/usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY',
-      stopTimeout: "5s",
       restarts: 3,
       port: '33000',
       health: {
@@ -135,7 +134,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
     },
     {
-      name: "on_change",
+      name: "on-change",
       exec: "/usr/local/bin/app-manage reload",
       when: {
         source: "watch.squid-gcp-proxy",
@@ -145,7 +144,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
   ],
   watches: [
     {
-    name: "squid-gcp-proxy",
+      name: "squid-gcp-proxy",
       interval: 3
     }
   ]

@@ -3,28 +3,39 @@ set -eo pipefail
 
 
 preStart() {
-  _log "Configuring application"
-  consul-template -once -consul-addr localhost:8500 -template \
-    "/etc/apache-fwdproxy/fwdproxy.conf.ctmpl:/etc/apache-fwdproxy/fwdproxy.conf"
+    _log "Configuring application"
+    touch /usr/local/apache/htdocs/health
+    configureApp
 }
 
 
 health() {
-  #curl --fail http://localhost:33000 > /dev/null
-  curl http://localhost:33000/health > /dev/null
+    #curl --fail http://localhost:33000 > /dev/null
+    curl --fail -sS http://localhost:33000/health
 }
 
 reload() {
-  _log "Configuring application"
-  consul-template -once -consul-addr localhost:8500 -template \
-    "/etc/apache-fwdproxy/fwdproxy.conf.ctmpl:/etc/apache-fwdproxy/fwdproxy.conf"
-  _log "reloading application"
-  /usr/local/apache/bin/apachectl \
-    -f /etc/apache-fwdproxy/httpd.conf \
-    -k graceful \
-    -D APACHE-FWDPROXY
+    health
+    if [ $? -eq 0 ]; then
+        _log "Configuring application"
+        configureApp
+        _log "reloading application"
+        /usr/local/apache/bin/apachectl \
+            -f /etc/apache-fwdproxy/httpd.conf \
+            -k graceful \
+            -D APACHE-FWDPROXY
+    else
+        _log "ERROR: application not running. Can't reload"
+    fi
 
 }
+
+configureApp() {
+    consul-template -once -consul-addr localhost:8500 -template \
+    "/etc/apache-fwdproxy/fwdproxy.conf.ctmpl:/etc/apache-fwdproxy/fwdproxy.conf"
+
+}
+
 _log() {
     echo "    $(date -u '+%Y-%m-%d %H:%M:%S') containerpilot: $@"
 }
@@ -43,7 +54,7 @@ until
             shift 1
         fi
 
-        $cmd "$@"
+        ${cmd} "$@"
         if [ $? == 127 ]; then
             help
         fi

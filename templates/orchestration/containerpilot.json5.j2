@@ -126,7 +126,6 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     {
       name: '{{ project_name }}',
       exec: '{{ command }}',
-      stopTimeout: "5s",
       restarts: 3,
 {% if service_port is defined %}
       port: '{{ service_port }}',
@@ -163,7 +162,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
 {% endif %}
     },
     {
-      name: "on_change",
+      name: "on-change",
       exec: "/usr/local/bin/app-manage reload",
       when: {
         source: "watch.squid-gcp-proxy",

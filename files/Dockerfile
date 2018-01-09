@@ -5,7 +5,7 @@ LABEL maintainer="Gareth Brown <gareth@mesoform.com>"
 LABEL description="Apache HTTPD set up as a forward proxy to Google API proxy"
 LABEL com.mesoform.baseimage=False
 LABEL com.joyent.autopilotpattern=True
-LABEL com.mesoform.builddate="2018-01-07T22:55:07Z"
+LABEL com.mesoform.builddate="2018-01-08T22:57:41Z"
 LABEL com.mesoform.baseimage.ver="mesoform/concierge-debian-base-image:devtest"
 LABEL com.docker.img.ver="mesoform/concierge-apache-fwdproxy:ver-0.1.0"
 
@@ -40,3 +40,9 @@ VOLUME [ "/var/www/httpd-data"  ]
 
 # Expose primary service port
 EXPOSE 33000
+
+HEALTHCHECK \
+    --interval=10s \
+    --timeout=3s \
+    --retries=4 \
+    CMD /usr/local/bin/app-manage health

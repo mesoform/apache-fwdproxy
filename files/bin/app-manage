@@ -10,8 +10,12 @@ preStart() {
 
 
 health() {
-    #curl --fail http://localhost:33000 > /dev/null
-    curl --fail -sS http://localhost:33000/health
+    msg=$(curl --fail -sS http://localhost:33000/health)
+    status=$?
+    if [ ! $? -eq 0 ]; then
+        echo ${msg}
+    fi
+    exit ${status}
 }
 
 reload() {

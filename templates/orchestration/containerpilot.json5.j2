@@ -59,7 +59,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       name: 'pre-start',
       exec: '{{ pre_start }}',
       when: {
-        source: "watch.squid-gcp-proxy",
+        source: "watch.{{ upstreams | last }}",
         once: 'healthy'
       }
     },
@@ -161,19 +161,23 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
 {% endif %}
     },
+{% for upstream in upstreams %}
     {
       name: "on-change",
       exec: "/usr/local/bin/app-manage reload",
       when: {
-        source: "watch.squid-gcp-proxy",
+        source: "watch.{{ upstream }}",
         each: "changed"
       }
-    }
+    },
+{% endfor %}
   ],
   watches: [
+{% for upstream in upstreams %}
     {
-    name: "squid-gcp-proxy",
+    name: "{{ upstream }}",
       interval: 3
-    }
+    },
+{% endfor %}
   ]
 }

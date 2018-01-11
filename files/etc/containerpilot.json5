@@ -140,12 +140,12 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
         source: "watch.squid-gcp-proxy",
         each: "changed"
       }
-    }
+    },
   ],
   watches: [
     {
     name: "squid-gcp-proxy",
       interval: 3
-    }
+    },
   ]
 }

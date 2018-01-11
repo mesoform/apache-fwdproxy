@@ -35,7 +35,7 @@ reload() {
 }
 
 configureApp() {
-    consul-template -once -consul-addr localhost:8500 -template \
+    consul-template -once -dedup -consul-addr localhost:8500 -template \
     "/etc/apache-fwdproxy/fwdproxy.conf.ctmpl:/etc/apache-fwdproxy/fwdproxy.conf"
 
 }

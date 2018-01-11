@@ -25,3 +25,6 @@ container_vars:
   - PREFIX={{ apache_prefix }} # environment variables you want built into your container image. Delete if redundant
 env_vars:
   - GOOGLE_API_PROXY=10.71.200.10 # environment variables you want passed to the container at runtime. Delete if redundant
+
+upstreams:
+  - squid-gcp-proxy

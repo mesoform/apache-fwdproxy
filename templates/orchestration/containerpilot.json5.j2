@@ -161,9 +161,10 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
 {% endif %}
     },
+{% if upstreams is defined %}
 {% for upstream in upstreams %}
     {
-      name: "on-change",
+      name: "on-change-{{ upstream }}",
       exec: "/usr/local/bin/app-manage reload",
       when: {
         source: "watch.{{ upstream }}",
@@ -171,13 +172,16 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
     },
 {% endfor %}
+{% endif %}
   ],
   watches: [
+{% if upstreams is defined %}
 {% for upstream in upstreams %}
     {
     name: "{{ upstream }}",
       interval: 3
     },
 {% endfor %}
+{% endif %}
   ]
 }

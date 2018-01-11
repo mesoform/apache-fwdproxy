@@ -134,7 +134,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
     },
     {
-      name: "on-change",
+      name: "on-change-squid-gcp-proxy",
       exec: "/usr/local/bin/app-manage reload",
       when: {
         source: "watch.squid-gcp-proxy",

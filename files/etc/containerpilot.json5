@@ -15,7 +15,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     {
       name: 'consul-agent',
       restarts: 'unlimited',
-      stopTimeout: "5s",
+      stopTimeout: '5s',
       exec: [
         '/usr/local/bin/consul', 'agent',
         '-config-dir=/etc/coprocesses/consul',
@@ -37,18 +37,18 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
     },
     {
-      name: "leave-consul",
-      exec: "consul leave",
+      name: 'leave-consul',
+      exec: 'consul leave',
       when: {
-        source: "consul-agent",
-        once: "stopping"
+        source: 'consul-agent',
+        once: 'stopping'
       }
     },
     {
       name: 'pre-start',
       exec: '/usr/local/bin/app-manage preStart',
       when: {
-        source: "watch.squid-gcp-proxy",
+        source: 'watch.squid-gcp-proxy',
         once: 'healthy'
       }
     },
@@ -126,7 +126,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       ],
       consul: {
         enableTagOverride: true,
-        deregisterCriticalServiceAfter: "10m"
+        deregisterCriticalServiceAfter: '10m'
       },
       when: {
         source: 'pre-start',
@@ -134,17 +134,17 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
     },
     {
-      name: "on-change-squid-gcp-proxy",
-      exec: "/usr/local/bin/app-manage reload",
+      name: 'on-change-squid-gcp-proxy',
+      exec: '/usr/local/bin/app-manage reload',
       when: {
-        source: "watch.squid-gcp-proxy",
-        each: "changed"
+        source: 'watch.squid-gcp-proxy',
+        each: 'changed'
       }
     },
   ],
   watches: [
     {
-    name: "squid-gcp-proxy",
+    name: 'squid-gcp-proxy',
       interval: 3
     },
   ]

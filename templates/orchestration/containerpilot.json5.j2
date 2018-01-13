@@ -16,7 +16,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
     {
       name: 'consul-agent',
       restarts: 'unlimited',
-      stopTimeout: "5s",
+      stopTimeout: '5s',
 {% if svc_discovery is defined %}
       exec: [
         '/usr/local/bin/consul', 'agent',
@@ -47,11 +47,11 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       }
     },
     {
-      name: "leave-consul",
-      exec: "consul leave",
+      name: 'leave-consul',
+      exec: 'consul leave',
       when: {
-        source: "consul-agent",
-        once: "stopping"
+        source: 'consul-agent',
+        once: 'stopping'
       }
     },
 {% if pre_start is defined %}
@@ -59,7 +59,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       name: 'pre-start',
       exec: '{{ pre_start }}',
       when: {
-        source: "watch.{{ upstreams | last }}",
+        source: 'watch.{{ upstreams | last }}',
         once: 'healthy'
       }
     },
@@ -147,7 +147,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
       ],
       consul: {
         enableTagOverride: true,
-        deregisterCriticalServiceAfter: "10m"
+        deregisterCriticalServiceAfter: '10m'
       },
 {% if pre_start is defined %}
       when: {
@@ -164,11 +164,11 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
 {% if upstreams is defined %}
 {% for upstream in upstreams %}
     {
-      name: "on-change-{{ upstream }}",
-      exec: "/usr/local/bin/app-manage reload",
+      name: 'on-change-{{ upstream }}',
+      exec: '{{ reload }}',
       when: {
-        source: "watch.{{ upstream }}",
-        each: "changed"
+        source: 'watch.{{ upstream }}',
+        each: 'changed'
       }
     },
 {% endfor %}
@@ -178,7 +178,7 @@ http://www.mesoform.com/blog-listing/info/the-concierge-paradigm
 {% if upstreams is defined %}
 {% for upstream in upstreams %}
     {
-    name: "{{ upstream }}",
+    name: '{{ upstream }}',
       interval: 3
     },
 {% endfor %}

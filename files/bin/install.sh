@@ -34,10 +34,3 @@ mv srclib/apr-1.6.3 srclib/apr
 tar xvf /tmp/apr-util-1.6.1.tar -C srclib/
 mv srclib/apr-util-1.6.1 srclib/apr-util
 mkdir /var/log/apache-fwdproxy
-
-
-#Customize	$ vi PREFIX/conf/httpd.conf
-#Test	$ PREFIX/bin/apachectl -k start
-
-## Centos
-# yum update && yum install -y httpd telnet net-tools vim

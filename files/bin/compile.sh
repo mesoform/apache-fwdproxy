@@ -28,8 +28,7 @@ apt-get purge libpcre3-dev \
 apt-get autoremove
 apt-get clean
 
-rm -rf /tmp/httpd-${HTTPD_VER} \
-    /var/lib/apt/lists/* \
-    /tmp/httpd-${HTTPD_VER}.tar.gz \
-    /tmp/apr-1.6.3.tar.gz \
-    /tmp/apr-util-1.6.1.tar.gz
+rm -rf /var/lib/apt/lists/* \
+    /tmp/httpd-${HTTPD_VER}.* \
+    /tmp/apr-1.6.3.* \
+    /tmp/apr-util-1.6.1.*

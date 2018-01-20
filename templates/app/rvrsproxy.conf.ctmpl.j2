@@ -1,0 +1,20 @@
+
+<Location "/balancer-manager">
+    SetHandler balancer-manager
+    Require host example.com
+</Location>
+
+
+## Reverse Proxy Config
+<Proxy balancer://squid-gcp-proxy>
+{% raw %}{{ range service "squid-gcp-proxy" }}    BalancerMember http://{{.Address}}:{{.Port}}
+{{end}}
+{% endraw %}
+    ProxySet lbmethod=bybusyness
+{% raw %}{{/* take the current subnet and configure to only allow these hosts */}}{% endraw %}
+    Require ip {% raw %}{{ file "/etc/host_subnet" }}{% endraw %}
+</Proxy>
+ProxyRequests Off
+ProxyPreserveHost On
+ProxyPass / balancer://squid-gcp-proxy/
+ProxyPassReverse / balancer://squid-gcp-proxy/

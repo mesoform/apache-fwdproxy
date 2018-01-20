@@ -7,7 +7,8 @@ service_tags:
   - googleproxy
 img_ver: Ver-0.1.0 # current version of your Docker image. REQUIRED
 pre_start: /usr/local/bin/app-manage preStart
-command: "{{ apache_prefix }}/bin/apachectl -Xf /etc/{{ project_name }}/httpd.conf -k start -D APACHE-FWDPROXY" # the command to start the application. REQUIRED
+proxy_type: apache-fwdproxy
+command: "{{ apache_prefix }}/bin/apachectl -Xf /etc/{{ project_name }}/httpd.conf -k start -D {{ proxy_type | upper }} " # the command to start the application. REQUIRED
 reload: /usr/local/bin/app-manage reload
 install_scripts:
   - /usr/local/bin/install.sh # install script found in files/bin. Use multiple scripts as a list for different image layers. REQUIRED

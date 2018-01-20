@@ -2,32 +2,10 @@
 ## the Google Cloud APIs
 
 
-## pid file location
-PidFile /var/run/httpd.pid
-
-## Connection settings
-Include /etc/{{ project_name }}/connection.conf
-
-## Thread settings
-Include /etc/{{ project_name }}/threadpool.conf
-
-## Compression
-Include /etc/{{ project_name }}/compression.conf
-
-
-## adding header so that we know what web server we are in
-Header add S APACHE-FWDPROXY
-
-## allow healthcheck
-ProxyPass /health !
-<location /health>
-    Options -Indexes
-    Require local
-</location>
-
 ## Forward Proxy Config
 <Proxy *>
-    Require ip 172.18.0.0/16
+{% raw %}{{/* take the current subnet and configure to only allow these hosts */}}{% endraw %}
+    Require ip {% raw %}{{ file "/etc/host_subnet" }}{% endraw %}
 </Proxy>
 ProxyRequests On
 AllowCONNECT 443 80
@@ -36,24 +14,7 @@ AllowCONNECT 443 80
 {% endraw %}
 
 
-## Reverse Proxy Config
-#<Proxy balancer://squid-gcp-proxy>
-#{% raw %}{{ range service "squid-gcp-proxy" }}    BalancerMember http://{{.Address}}:{{.Port}}
-#{{end}}
-#{% endraw %}
-#    ProxySet lbmethod=bybusyness
-#    Require ip 172.19.0.0/16
-#</Proxy>
-#ProxyRequests Off
-#ProxyPreserveHost On
-#ProxyPass / balancer://squid-gcp-proxy/
-#ProxyPassReverse / balancer://squid-gcp-proxy/
 
 
-Listen 0.0.0.0:{{ service_port }}
-
-LogLevel {{ log_level | default("info") | lower }}
-ErrorLog "/dev/stderr"
-CustomLog "/dev/stdout" p14
 
 

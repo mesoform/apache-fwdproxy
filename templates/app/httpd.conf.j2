@@ -50,6 +50,8 @@ User www-data
 Group www-data
 # End - user and group #
 
+Listen 0.0.0.0:{{ service_port }}
+
 # ServerAdmin #
 ServerAdmin you@your.address
 # End - ServerAdmin #
@@ -87,6 +89,11 @@ LogFormat "%h - %u %t \"%r\" %s \"%{Content-Length}o\" \"%{Referer}i\" \"%{User-
 #LogFormat "%{User-agent}i" agent
 #LogFormat "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x %{Client_IP}e %{Client_Port}e" requests
 # End - additional apache configs
+
+
+LogLevel {{ log_level | default("info") | lower }}
+ErrorLog "/dev/stderr"
+CustomLog "/dev/stdout" p14
 
 # MIME settings #
 TypesConfig /etc/mime.types
@@ -141,13 +148,37 @@ ErrorDocument 500 "Sorry, an error occurred while processing your request"
 HostnameLookups Off
 # End - Hostname Lookups #
 
-<Location "/balancer-manager">
-    SetHandler balancer-manager
-    Require host example.com
-</Location>
+
+## pid file location
+PidFile /var/run/httpd.pid
+
+## Connection settings
+Include /etc/{{ project_name }}/connection.conf
+
+## Thread settings
+Include /etc/{{ project_name }}/threadpool.conf
+
+## Compression
+Include /etc/{{ project_name }}/compression.conf
+
+
+## adding header so that we know what web server we are in
+Header add S APACHE-FWDPROXY
+
+## allow healthcheck
+ProxyPass /health !
+<location /health>
+    Options -Indexes
+    Require local
+</location>
 
 
 # stand alone webserver Instance configruation setting up Apache as a forward proxy #
 <IfDefine APACHE-FWDPROXY>
   Include /etc/{{ project_name }}/fwdproxy.conf
+</IfDefine>
+
+# stand alone webserver Instance configruation setting up Apache as a reverse proxy #
+<IfDefine APACHE-RVRSPROXY>
+  Include /etc/{{ project_name }}/rvrsproxy.conf
 </IfDefine>

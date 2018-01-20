@@ -27,6 +27,7 @@ services:
     environment:
       - EM_SERVER=zabbix-server.inst.gaz.gb-home.cns.gorillass.co.uk
       - SVC_DISCOVERY=consul:8301
-      - GOOGLE_API_PROXY=10.71.200.10
+      - CLIENT="Google Cloud SDK"
+      - COMMAND=/usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-RVRSPROXY
     ## uncomment to test your application start without containerpilot
-    #entrypoint: /usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY
+    #entrypoint: /usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY 

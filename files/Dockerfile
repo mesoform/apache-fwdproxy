@@ -5,7 +5,7 @@ LABEL maintainer="Gareth Brown <gareth@mesoform.com>"
 LABEL description="Apache HTTPD set up as a forward proxy to Google API proxy"
 LABEL com.mesoform.baseimage=False
 LABEL com.joyent.autopilotpattern=True
-LABEL com.mesoform.builddate="2018-01-20T13:46:37Z"
+LABEL com.mesoform.builddate="2018-01-20T21:49:09Z"
 LABEL com.mesoform.baseimage.ver="mesoform/concierge-debian-base-image:devtest"
 LABEL com.docker.img.ver="mesoform/concierge-apache-fwdproxy:ver-0.1.0"
 
@@ -15,7 +15,7 @@ ENV DNS_DOMAIN=apache-fwdproxy.gcpservices.mesoform.com
 RUN unset CONSUL_AGENT
 ENV LOG_LEVEL="debug"
 ENV LOG_FORMAT="text"
-ENV COMMAND="/usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY"
+ENV COMMAND="/usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY "
 ENV PREFIX=/usr/local/apache
 
 # Set some build arguments

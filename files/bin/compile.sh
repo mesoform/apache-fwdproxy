@@ -13,7 +13,7 @@ cd /tmp/httpd-${HTTPD_VER}
         --enable-so \
         --enable-deflate \
         --enable-mime-magic \
-        --with-mpm=prefork \
+        --with-mpm=worker \
         --with-included-apr \
         --with-port=${PROXY_PORT} && \
     make && \

@@ -53,7 +53,8 @@ Group www-data
 Listen 0.0.0.0:{{ service_port }}
 
 # ServerAdmin #
-ServerAdmin you@your.address
+{% set maintainer = img_maintainer.split('<') %}
+ServerAdmin {{ maintainer[1] | replace(">", "") }}
 # End - ServerAdmin #
 
 # Restrict server token #

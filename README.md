@@ -33,30 +33,48 @@ Now we have our local development environment set up along with some primitives 
 
 Next we need to give the playbook instructions how to install our application. We didn't want to restrict people to having to 
 learn the intrinsic details of Docker, so this is done by providing a normal script or set of scripts to the playbook. In this 
-example we demonstrate this by [compiling Apache in one script](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/compile.sh)
- and performing [other activities in another](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/install.sh). We 
- also drop any static configuration files into the 
- [files/etc directory](https://github.com/mesoform/apache-fwdproxy/tree/master/files/etc) (ignore containerpilot.json5 for now) 
- and any Jinja2 templates into the [templates/app directory](https://github.com/mesoform/apache-fwdproxy/tree/master/templates/app).
+example we demonstrate this by
+[compiling Apache in one script](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/compile.sh) and performing
+[other activities in another](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/install.sh). We 
+also drop any static configuration files into the
+[files/etc directory](https://github.com/mesoform/apache-fwdproxy/tree/master/files/etc) (ignore containerpilot.json5 for now) 
+and any Jinja2 templates into the [templates/app directory](https://github.com/mesoform/apache-fwdproxy/tree/master/templates/app).
 
 In this paradigm, orchestration is the responsibility of the applications owners (who know best how it should operate) and 
 executed by [Containerpilot](https://github.com/joyent/containerpilot) running inside the container. Orchestration can be as 
 simple as passing commands to start and reload the application but also more powerful by supplying a script to abstract away all 
 the complexities. Here we do just that by including our very simple 
 [app-manage script](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/app-manage) and setting our 
-[pre_start](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L9), 
-[command](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L11), 
-[healthcheck](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L19) and 
-[reload](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L12) variables.
+[pre_start](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L25), 
+[command](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L27), 
+[healthcheck](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L24) and 
+[reload](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L28) variables.
+
+NB. All scripts are installed into /usr/local/bin inside the container all configuration into /etc/apache-fwdproxy (the name of
+our project)
 
 For our effective orchestration our application is going to need to know about other applications on which it depends. In the 
 case of Apache, that is Squid; and Squid registers as a 
 [service called squid-gcp-proxy](https://github.com/mesoform/squid-gcp-proxy/blob/master/defaults/main.yml#L3) in Consul (note, 
 this links to the project_name of the Squid repository). So we add that to our 
-[upstreams list](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L31). Then we add some logic into our 
-[Apache forward proxy configuration template](https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/fwdproxy.conf.ctmpl)
+[upstreams list](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L29). Then we add some logic into our 
+[Apache forward proxy configuration template](https://github.com/mesoform/apache-fwdproxy/blob/master/templates/app/fwdproxy.conf.ctmpl.j2)
  and our [reverse template](https://github.com/mesoform/apache-fwdproxy/blob/master/templates/app/rvrsproxy.conf.ctmpl.j2), so 
  that [consul-template](https://github.com/hashicorp/consul-template) can 
  [(re)configure our application](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/app-manage#L42) on 
  [startup](https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/containerpilot.json5#L49) and if there are any 
  [changes](https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/containerpilot.json5#L138) to our upstream Squid proxy. 
+
+Finally, we set some [more operating variables](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L16-L30),
+[default container environment variables](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L33), 
+[wider system environment variables](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L35) (we don't really use
+any) and [variables we need for our install scripts](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L9-L14).
+
+When we run `ansible-playbook -v app.yml` Ansible performs the following actions:
+1. creates `files/etc/apache-fwdproxy` (because initially it doesn't exist)
+1. Processes the files with a `.j2` extension in `templates/app` through the Jinja2 template engine, modifies them if required and 
+copies them (minus `.j2` extension) to `files/etc/apache-fwdproxy`
+1. Generates our `docker-compose.yml` and `containerpilot.json5` orchestration files based on our provided variables. Then places 
+`containerpilot.json5` in `files/etc` and `docker-compose.yml` in the top level playbook directory.
+1. Generates a standardised Dockerfile from the `Mesoform Debian base image` and copies it to the Docker build directory `files/`
+1.  

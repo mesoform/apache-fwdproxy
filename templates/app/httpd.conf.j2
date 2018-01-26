@@ -175,11 +175,11 @@ ProxyPass /health !
 
 
 # stand alone webserver Instance configruation setting up Apache as a forward proxy #
-<IfDefine APACHE-FWDPROXY>
+<IfDefine FORWARD>
   Include /etc/{{ project_name }}/fwdproxy.conf
 </IfDefine>
 
 # stand alone webserver Instance configruation setting up Apache as a reverse proxy #
-<IfDefine APACHE-RVRSPROXY>
+<IfDefine REVERSE>
   Include /etc/{{ project_name }}/rvrsproxy.conf
 </IfDefine>

@@ -23,7 +23,7 @@ volumes:
 service_port: 33000 # main service port of the application which will be published to the service discovery system for downstream clients. Delete if redundant
 healthcheck: /usr/local/bin/app-manage health # the command which can be used to make sure the application is running correctly. REQUIRED
 pre_start: /usr/local/bin/app-manage preStart
-proxy_type: apache-fwdproxy
+proxy_type: forward
 command: "{{ apache_prefix }}/bin/apachectl -Xf /etc/{{ project_name }}/httpd.conf -k start -D {{ proxy_type | upper }} " # the command to start the application. REQUIRED
 reload: /usr/local/bin/app-manage reload
 upstreams:

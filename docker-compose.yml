@@ -25,8 +25,8 @@ services:
       - 33000
       - 10050
     environment:
-      - EM_SERVER=zabbix-server.inst.gaz.gb-home.cns.gorillass.co.uk
+      - EM_SERVER=zabbix-server
       - SVC_DISCOVERY=consul:8301
       - CLIENT="Google Cloud SDK"
     ## uncomment to test your application start without containerpilot
-    #entrypoint: /usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D APACHE-FWDPROXY 
+    #entrypoint: /usr/local/apache/bin/apachectl -Xf /etc/apache-fwdproxy/httpd.conf -k start -D FORWARD 

@@ -71,10 +71,66 @@ Finally, we set some [more operating variables](https://github.com/mesoform/apac
 any) and [variables we need for our install scripts](https://github.com/mesoform/apache-fwdproxy/blob/master/vars/main.yml#L9-L14).
 
 When we run `ansible-playbook -v app.yml` Ansible performs the following actions:
-1. creates `files/etc/apache-fwdproxy` (because initially it doesn't exist)
+1. Creates `files/etc/apache-fwdproxy` (because initially it doesn't exist)
 1. Processes the files with a `.j2` extension in `templates/app` through the Jinja2 template engine, modifies them if required and 
 copies them (minus `.j2` extension) to `files/etc/apache-fwdproxy`
 1. Generates our `docker-compose.yml` and `containerpilot.json5` orchestration files based on our provided variables. Then places 
 `containerpilot.json5` in `files/etc` and `docker-compose.yml` in the top level playbook directory.
-1. Generates a standardised Dockerfile from the `Mesoform Debian base image` and copies it to the Docker build directory `files/`
-1.  
+1. Generates a standardised Dockerfile from the 
+[Mesoform Debian base image](https://hub.docker.com/r/mesoform/concierge-debian-base-image/) and copies it to the Docker build 
+directory `files/`
+1. Builds and tags a Docker image
+1. Generates a basic Docker Compose file for our integration services (Consul and Zabbix)
+1. Lastly, we've manually dropped the Compose file into the root directory for Squid. We may make upstreams a map which includes 
+the image and automate this at some point.
+
+Once finished, if there were any changes to upstream sub-modules, then you'll get a message, so look out for these if there are
+any issues. Then the only that remains is to orchestrate your application. This also is currently manual but will be included 
+in the playbook soon.
+
+```docker-compose -f docker-compose-integrations.yml -f docker-compose.yml -f docker-compose-app-integrations.yml up```
+
+You can log into the containers and look how the configuration happened but you'll also find the events in the logs.
+
+Next, lets get the mapped port address of Apache (local Docker deployment) and grab the mapped port for `33000`
+```bash
+(gaz@gMac)-(21:07:23)-(test)
+$docker ps
+CONTAINER ID        IMAGE                                          COMMAND                  CREATED             STATUS                    PORTS                                                                                                                                                                                                      NAMES
+44338060c8b3        mesoform/concierge-squid-gcp-proxy:0.1.0       "/usr/local/bin/cont…"   29 seconds ago      Up 26 seconds (healthy)   3128/tcp, 10050/tcp                                                                                                                                                                                        apachefwdproxy_squid-gcp-proxy_1
+482c7122532f        mesoform/concierge-apache-fwdproxy:ver-0.1.0   "/usr/local/bin/cont…"   29 seconds ago      Up 26 seconds (healthy)   0.0.0.0:32908->10050/tcp, 0.0.0.0:32907->33000/tcp                                                                                                                                                         apachefwdproxy_app_1
+a0a3375c1813        mesoform/concierge-consul:devtest              "/bin/containerpilot…"   29 seconds ago      Up 27 seconds             53/tcp, 10050/tcp, 53/udp, 0.0.0.0:32906->8300/tcp, 0.0.0.0:32809->8301/udp, 0.0.0.0:32905->8301/tcp, 0.0.0.0:32808->8302/udp, 0.0.0.0:32904->8302/tcp, 0.0.0.0:32903->8400/tcp, 0.0.0.0:32902->8500/tcp   apachefwdproxy_consul_1
+```
+
+and update our Google Cloud SDK config:
+
+```bash
+$grep proxy ~/.boto 
+# To use a proxy, edit and uncomment the proxy and proxy_port lines.
+# If you need a user/password with this proxy, edit and uncomment
+# lookups by client machines set proxy_rdns = True
+# If proxy_host and proxy_port are not specified in this file and
+# one of the OS environment variables http_proxy, https_proxy, or
+# HTTPS_PROXY is defined, gsutil will use the proxy server specified
+proxy = localhost
+proxy_port = 32907
+#proxy_user = <proxy user>
+#proxy_pass = <proxy password>
+#proxy_rdns = <let proxy server perform DNS lookups>
+```
+
+then check it works
+
+```bash
+(gaz@gMac)-(21:07:59)-(test)
+$gsutil ls
+gs://gb-test-bucket-1/
+gs://gb-test-bucket-2/
+gs://log-storage-bucket/
+```
+
+We can also scale Squid and check that the config in the Apache container has updated. Scale Squid by running:
+
+```
+$ docker-compose -f docker-compose-integrations.yml -f docker-compose.yml -f docker-compose-app-integrations.yml up -d --scale squid-gcp-proxy=2
+``` 

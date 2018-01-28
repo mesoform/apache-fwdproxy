@@ -1,0 +1,17 @@
+## Here we're configuring the server to use another upstream proxy for using
+## the Google Cloud APIs
+
+
+## Forward Proxy Config
+<Proxy *>
+{{/* take the current subnet and configure to only allow these hosts */}}    Require ip {{ file "/etc/host_subnet" }}</Proxy>
+ProxyRequests On
+AllowCONNECT 443 80
+{{ range service "squid-gcp-proxy" }}ProxyRemote * http://{{.Address}}:{{.Port}}
+{{end}}
+
+
+
+
+
+

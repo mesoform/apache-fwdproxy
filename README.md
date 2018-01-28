@@ -36,9 +36,7 @@ learn the intrinsic details of Docker, so this is done by providing a normal scr
 example we demonstrate this by
 [compiling Apache in one script](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/compile.sh) and performing
 [other activities in another](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/install.sh). We 
-also drop any static configuration files into the
-[files/etc directory](https://github.com/mesoform/apache-fwdproxy/tree/master/files/etc) (ignore containerpilot.json5 for now) 
-and any Jinja2 templates into the [templates/app directory](https://github.com/mesoform/apache-fwdproxy/tree/master/templates/app).
+also drop any Jinja2 templates into the [templates/app directory](https://github.com/mesoform/apache-fwdproxy/tree/master/templates/app).
 
 In this paradigm, orchestration is the responsibility of the applications owners (who know best how it should operate) and 
 executed by [Containerpilot](https://github.com/joyent/containerpilot) running inside the container. Orchestration can be as 
@@ -134,3 +132,29 @@ We can also scale Squid and check that the config in the Apache container has up
 ```
 $ docker-compose -f docker-compose-integrations.yml -f docker-compose.yml -f docker-compose-app-integrations.yml up -d --scale squid-gcp-proxy=2
 ``` 
+
+That's pretty much it. Below are some noteworthy points about the configuration if you want to know more. details are covered 
+in the concierge-app-playbook readme but we feel these are worth a mention here as well
+
+## Noteworthy configuration 
+
+* We have a custom configuration option called proxy_mode which is set to forward. This is an option only specific to Apache and
+ will configure in forward mode but if set to reverse, will configure in reverse mode. Reverse mode isn't much use in our Google 
+ API example but it is so simple to implement that we added it so as to allow easy reuse.
+* The command variable is set to the raw command and not a function of the app-manage script, simply to demonstrate another way.
+* When an upstream service goes healthy for the first time, Containerpilot emits a [healthy _and_ a 
+changed](https://github.com/joyent/containerpilot/blob/master/docs/30-configuration/35-watches.md) event. So, to prevent a race 
+condition between our application [starting](https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/containerpilot.json5#L48)
+and [reloading]https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/containerpilot.json5#L119, we add [functionality
+ to account for it](https://github.com/mesoform/apache-fwdproxy/blob/master/files/bin/app-manage#L27-L38).  Applications other 
+ Apache don't seem to suffer the same issue of its `graceful` command starting the application in an odd manner.
+* The main application command is configured as a container environment variable and read by Containerpilot. We've done this so 
+that it is easy to set a `COMMAND` environment variable in your docker-compose.yml file to override the value [built into the
+image in the Dockerfile](https://github.com/mesoform/apache-fwdproxy/blob/master/files/Dockerfile#L18); or by querying 
+[containerpilot's control plane](https://github.com/joyent/containerpilot/blob/master/docs/30-configuration/37-control-plane.md#putenv-post-v3env)
+* Containerpilot can be bypassed all together and you application started on it's own by simply uncommenting the [entrypoint
+option in docker-compose.yml](https://github.com/mesoform/apache-fwdproxy/blob/master/docker-compose.yml#L32)
+* In this example we only have one upstream. However, we understand that sometimes the will be more than one. Therefore we have 
+made upstreams a list where the last service in that list will be the one which our application []waits on before 
+starting](https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/containerpilot.json5#L50-L52) (requires pre_start to
+be set).

@@ -12,10 +12,12 @@ This was used as an example so as to demonstrate using [active discovery](https:
  to configure:
 * Apache with new and updated upstream servers
 * Squid with dynamic ACLs for downstream clients
-We also demonstrate how to take advantage of [inside-container orchestration](http://autopilotpattern.io) for:
-* understand our local environment and preconfigure our application
-* understand our wider system environment and run jobs based on conditions
-* monitor the health of our applications and report their state for other systems to consume
+
+We also demonstrate how to take advantage of [inside-container orchestration](http://autopilotpattern.io) to:
+* Understand our local environment and preconfigure our application
+* Understand our wider system environment and run jobs based on conditions
+* Monitor the health of our applications and report their state for other systems to consume
+
 Lastly, we show how the playbook provides a consistent and simple mechanism to generate container images, scheduling and 
 orchestration code.
 
@@ -158,3 +160,12 @@ option in docker-compose.yml](https://github.com/mesoform/apache-fwdproxy/blob/m
 made upstreams a list where the last service in that list will be the one which our application []waits on before 
 starting](https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/containerpilot.json5#L50-L52) (requires pre_start to
 be set).
+* we make use of a number of default settings in our application management. For example, our healthchecks are configurable with
+settings like [timeout and interval](https://github.com/mesoform/concierge-app-playbook/blob/master/vars/main.yml#L6-L8) but we 
+don't set these and use the [preconfigured playbook defaults](https://github.com/mesoform/create-concierge-app/blob/master/defaults/main.yml#L8-L10)
+* We let the playbook handle our configuration file placement by putting all files (even those that aren't processed)in the 
+templates directory and adding a `.j2` extension. We do this because it keeps things together and demonstrates the automatic
+creation of the configuration directory. However, you can manually create any directories inside the `files` directory and they
+will all be copied up to the root directory of the container. E.g. If you want something copied to `/usr/libexec/bin`, you will
+need to add `files/usr/libexec/bin/some_file`
+

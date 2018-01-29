@@ -157,7 +157,7 @@ image in the Dockerfile](https://github.com/mesoform/apache-fwdproxy/blob/master
 * Containerpilot can be bypassed all together and you application started on it's own by simply uncommenting the [entrypoint
 option in docker-compose.yml](https://github.com/mesoform/apache-fwdproxy/blob/master/docker-compose.yml#L32)
 * In this example we only have one upstream. However, we understand that sometimes the will be more than one. Therefore we have 
-made upstreams a list where the last service in that list will be the one which our application []waits on before 
+made upstreams a list where the last service in that list will be the one which our application [waits on before 
 starting](https://github.com/mesoform/apache-fwdproxy/blob/master/files/etc/containerpilot.json5#L50-L52) (requires pre_start to
 be set).
 * we make use of a number of default settings in our application management. For example, our healthchecks are configurable with

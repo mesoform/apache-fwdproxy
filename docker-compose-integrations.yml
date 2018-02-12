@@ -7,7 +7,7 @@ version: '2.1'
 services:
   consul:
     image: "mesoform/concierge-consul:devtest"
-    domainname: "consul.apache-fwdproxy.gcpservices.mesoform.com"
+    domainname: "consul.svc.ops.mesoform-services.com"
     dns_search:
       - apache-fwdproxy.gcpservices.mesoform.com
       - svc.ops.mesoform-services.com
@@ -19,6 +19,7 @@ services:
     ## sends network_mode=default by default. The uncommenting of this line is handled
     ## in the Ansible code but can obviously be uncommented personally for manual interaction
     # network_mode: bridge
+    # env_file: _env
     ports:
       - 8301/udp
       - 8301/tcp
@@ -36,3 +37,107 @@ services:
         -bootstrap-expect 1
         -config-dir=/etc/consul
         -ui-dir /ui
+
+  mysql:
+    image: "mesoform/concierge-mysql:devtest"
+    domainname: "mysql.svc.ops.mesoform-services.com"
+    dns_search:
+      - apache-fwdproxy.gcpservices.mesoform.com
+      - svc.ops.mesoform-services.com
+    labels:
+      - triton.cns.services=mysql
+    restart: always
+    mem_limit: "512m"
+    ## For Triton bridge mode needs explicitly setting because the docker compose client
+    ## sends network_mode=default by default. The uncommenting of this line is handled
+    ## in the Ansible code but can obviously be uncommented personally for manual interaction
+    # network_mode: bridge
+    env_file: _env
+    depends_on:
+      - consul
+    links:
+      - consul
+    expose:
+      - '3306'
+    environment:
+      - CONSUL_AGENT=1
+      - LOG_LEVEL=DEBUG
+      - SERVICE_NAME=mysql
+      - CONSUL=consul
+      - EM_SERVER=zbxserver
+
+  zbxserver:
+    image: "mesoform/concierge-zabbix:devtest"
+    domainname: "zabbix-server.svc.ops.mesoform-services.com"
+    dns_search:
+      - apache-fwdproxy.gcpservices.mesoform.com
+      - svc.ops.mesoform-services.com
+    labels:
+      - triton.cns.services=zbxserver
+    restart: always
+    mem_limit: "128m"
+    ## For Triton bridge mode needs explicitly setting because the docker compose client
+    ## sends network_mode=default by default. The uncommenting of this line is handled
+    ## in the Ansible code but can obviously be uncommented personally for manual interaction
+    # network_mode: bridge
+    # env_file: _env
+    depends_on:
+      - consul
+      - mysql
+    links:
+      - consul
+      - mysql
+    ports:
+      - 10051
+      - 10051/tcp
+    environment:
+      DB_SERVER_HOST: "172.19.0.5"
+      DB_SERVER_PORT: 3306
+      DB_SERVER_ROOT_PASS: "dbuserpwd"
+      MYSQL_DATABASE: "zabbix"
+      DB_SERVER_ROOT_USER: "dbuser"
+      MYSQL_USER: "zabbix"
+      MYSQL_PASSWORD: "zbxusrpwd"
+      EM_SERVER: "zbxserver"
+      ZBX_USER: "Admin"
+      ZBX_PASS: "zbxusrpwd"
+      ZBX_API_HOST: "172.19.0.7"
+      ZBX_CONFIG_DIR: "/usr/lib/zabbix/app_config"
+      ZBX_DEBUGLEVEL: "4"
+      ZBX_CACHESIZE: "64M"
+
+  zbxweb:
+    image: "mesoform/concierge-zabbix-web:devtest"
+    domainname: "zabbix-web.svc.ops.mesoform-services.com"
+    dns_search:
+      - apache-fwdproxy.gcpservices.mesoform.com
+      - svc.ops.mesoform-services.com
+    labels:
+      - triton.cns.services=zbxweb
+    restart: always
+    mem_limit: "256m"
+    ## For Triton bridge mode needs explicitly setting because the docker compose client
+    ## sends network_mode=default by default. The uncommenting of this line is handled
+    ## in the Ansible code but can obviously be uncommented personally for manual interaction
+    # network_mode: bridge
+    # env_file: _env
+    depends_on:
+      - consul
+      - mysql
+      - zbxserver
+    links:
+      - consul
+      - mysql
+      - zbxserver
+    ports:
+      - 80
+      - 443
+    environment:
+      ZBX_SERVER_HOST: "zbxserver"
+      ZBX_SERVER_NAME: "zabbix-mesoform"
+      EM_SERVER: "zbxserver"
+      DB_SERVER_HOST: "mysql"
+      MYSQL_DATABASE: "zabbix"
+      MYSQL_USER: "zabbixadmin"
+      MYSQL_PASSWORD: "zbxusrpwd"
+      TZ: "UTC"

@@ -55,7 +55,7 @@ services:
       - EM_SERVER=zbxserver
 
   zbxserver:
-    image: "mesoform/concierge-zabbix:devtest"
+    image: "mesoform/concierge-zabbix:latest"
     domainname: "zabbix.oaas.mesoform.com"
     labels:
       - triton.cns.services=zbxserver

@@ -25,7 +25,7 @@ services:
       - 33000
       - 10050
     environment:
-      - EM_SERVER=zabbix-server
+      - EM_SERVER=zbxserver
       - SVC_DISCOVERY=consul:8301
       - CLIENT="Google Cloud SDK"
     ## uncomment to test your application start without containerpilot

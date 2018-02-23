@@ -1,0 +1,12 @@
+# Environment variables for MySQL service
+MYSQL_USER=zabbix
+MYSQL_PASSWORD=zbxusrpwd
+MYSQL_ROOT_PASSWORD=zbxrootpwd
+MYSQL_REPL_USER=repluser
+MYSQL_REPL_PASSWORD=replusrpwd
+MYSQL_DATABASE=zabbix
+
+# Environment variables for locals storage
+STORAGE_DIR=/tmp
+SNAPSHOT_BACKEND=local
+

@@ -85,7 +85,7 @@ services:
       ZBX_PASS: "zabbix"
       ZBX_API_HOST: "172.18.0.5"
       ZBX_CONFIG_DIR: "/usr/lib/zabbix/app_config"
-      ZBX_DEBUGLEVEL: "5"
+      ZBX_DEBUGLEVEL: "4"
       ZBX_CACHESIZE: "64M"
 
   zbxweb:

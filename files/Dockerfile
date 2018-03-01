@@ -5,13 +5,12 @@ LABEL maintainer="Gareth Brown <gareth@mesoform.com>"
 LABEL description="Apache HTTPD set up as a forward proxy to Google API proxy"
 LABEL com.mesoform.baseimage=False
 LABEL com.joyent.autopilotpattern=True
-LABEL com.mesoform.builddate="2018-02-10T15:44:12Z"
+LABEL com.mesoform.builddate="2018-03-01T21:37:40Z"
 LABEL com.mesoform.baseimage.ver="mesoform/concierge-debian-base-image:devtest"
 LABEL com.docker.img.ver="mesoform/concierge-apache-fwdproxy:ver-0.1.0"
 
 # Set some environment variables
 ENV DOCKER_IMG_VER="mesoform/concierge-apache-fwdproxy:ver-0.1.0"
-ENV DNS_DOMAIN=apache-fwdproxy.gcpservices.mesoform.com
 RUN unset CONSUL_AGENT
 ENV LOG_LEVEL="debug"
 ENV LOG_FORMAT="text"
@@ -28,15 +27,16 @@ ARG PROXY_PORT=33000
 
 # If we have any install scripts, run them.
 RUN chmod -R +x /usr/local/bin/install.sh && \
+    sync && \
     /usr/local/bin/install.sh
 RUN chmod -R +x /usr/local/bin/compile.sh && \
+    sync && \
     /usr/local/bin/compile.sh
 
 # make directories
 RUN mkdir -p /var/www/httpd-data 
 # define volumes if set
-VOLUME [ "/var/www/httpd-data"  ]
-
+VOLUME /var/www/httpd-data 
 
 # Expose primary service port
 EXPOSE 33000

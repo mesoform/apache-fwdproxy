@@ -6,7 +6,7 @@
 version: '2.1'
 services:
   consul:
-    image: "mesoform/concierge-consul:latest"
+    image: "mesoform/concierge-consul:devtest"
     domainname: "consul.oaas.mesoform.com"
     dns_search:
       - apache-fwdproxy.gcpservices.mesoform.com
@@ -55,7 +55,7 @@ services:
       - EM_SERVER=zbxserver
 
   zbxserver:
-    image: "mesoform/concierge-zabbix:latest"
+    image: "mesoform/concierge-zabbix:devtest"
     domainname: "zabbix.oaas.mesoform.com"
     labels:
       - triton.cns.services=zbxserver
@@ -85,11 +85,12 @@ services:
       ZBX_PASS: "zabbix"
       ZBX_API_HOST: "172.18.0.5"
       ZBX_CONFIG_DIR: "/usr/lib/zabbix/app_config"
-      ZBX_DEBUGLEVEL: "4"
+      ZBX_DEBUGLEVEL: "3"
       ZBX_CACHESIZE: "64M"
+      DOCKER_HOST: "tcp://dockerapi:1234"
 
   zbxweb:
-    image: "mesoform/concierge-zabbix-web:latest"
+    image: "mesoform/concierge-zabbix-web:devtest"
     domainname: "zabbix-web.oaas.mesoform.com"
     labels:
       - triton.cns.services=zbxweb
@@ -120,3 +121,15 @@ services:
       MYSQL_USER: "zabbix"
       MYSQL_PASSWORD: "zbxusrpwd"
       TZ: "UTC"
+
+  dockerapi:
+    container_name: "dockerapi"
+    image: "bobrik/socat"
+    mem_limit: "64m"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - 1234
+    command: TCP-LISTEN:1234,fork UNIX-CONNECT:/var/run/docker.sock
+    depends_on:
+      - zbxweb

@@ -5,12 +5,12 @@ LABEL maintainer="Gareth Brown <gareth@mesoform.com>"
 LABEL description="Apache HTTPD set up as a forward proxy to Google API proxy"
 LABEL com.mesoform.baseimage=False
 LABEL com.joyent.autopilotpattern=True
-LABEL com.mesoform.builddate="2018-03-01T21:37:40Z"
+LABEL com.mesoform.builddate="2018-03-04T20:35:38Z"
 LABEL com.mesoform.baseimage.ver="mesoform/concierge-debian-base-image:devtest"
-LABEL com.docker.img.ver="mesoform/concierge-apache-fwdproxy:ver-0.1.0"
+LABEL com.docker.img.ver="mesoform/concierge-apache-fwdproxy:ver-1.0.0"
 
 # Set some environment variables
-ENV DOCKER_IMG_VER="mesoform/concierge-apache-fwdproxy:ver-0.1.0"
+ENV DOCKER_IMG_VER="mesoform/concierge-apache-fwdproxy:ver-1.0.0"
 RUN unset CONSUL_AGENT
 ENV LOG_LEVEL="debug"
 ENV LOG_FORMAT="text"

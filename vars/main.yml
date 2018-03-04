@@ -5,7 +5,7 @@ install_scripts:
   - /usr/local/bin/install.sh # install script found in files/bin. Use multiple scripts as a list for different image layers. REQUIRED
   - /usr/local/bin/compile.sh
 base_img_ver: devtest
-img_ver: Ver-0.1.0 # current version of your Docker image. REQUIRED
+img_ver: Ver-1.0.0 # current version of your Docker image. REQUIRED
 build_args:
   - HTTPD_VER=2.4.29 # Variables only needed for the container build. Delete if redundant
   - PREFIX={{ apache_prefix }}

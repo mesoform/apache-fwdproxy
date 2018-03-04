@@ -5,8 +5,8 @@
 version: '2.1'
 
 services:
-  app:
-    image: "mesoform/concierge-apache-fwdproxy:ver-0.1.0"
+  apache-fwdproxy:
+    image: "mesoform/concierge-apache-fwdproxy:ver-1.0.0"
     domainname: "apache-fwdproxy.gcpservices.mesoform.com"
     dns_search:
       - apache-fwdproxy.gcpservices.mesoform.com
@@ -27,7 +27,7 @@ services:
       - 33000
       - 10050
     environment:
-      - EM_SERVER=zbxserver
+      - EM_SERVER=zabbix-server
       - SVC_DISCOVERY=consul:8301
       - CLIENT="Google Cloud SDK"
     ## uncomment to test your application start without containerpilot

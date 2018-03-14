@@ -5,7 +5,7 @@ LABEL maintainer="Gareth Brown <gareth@mesoform.com>"
 LABEL description="Apache HTTPD set up as a forward proxy to Google API proxy"
 LABEL com.mesoform.baseimage=False
 LABEL com.joyent.autopilotpattern=True
-LABEL com.mesoform.builddate="2018-03-04T20:35:38Z"
+LABEL com.mesoform.builddate="2018-03-07T16:14:22Z"
 LABEL com.mesoform.baseimage.ver="mesoform/concierge-debian-base-image:devtest"
 LABEL com.docker.img.ver="mesoform/concierge-apache-fwdproxy:ver-1.0.0"
 
